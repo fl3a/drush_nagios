@@ -44,9 +44,6 @@ define('NAGIOS_CRITICAL', 2);
  *   but also possible for versions before drupal 5 like drupal/4.7.x or image/4.7.x etc without error
  * @param $project 
  *   Name of the project. Default 'drupal'
- * @param $float
- *   Modifies return value. 
- *   If TRUE it returns the recommended version of supplied project as float. Default FALSE
  * @param $path    
  *   Path to xml file which contains the release history.
  *   This could be an absolute path to file on your filesystem 
@@ -220,7 +217,7 @@ define('NAGIOS_CRITICAL', 2);
  * @endcode
  */
 //function _nagios_recommended_version($core, $project = 'drupal', $float = FALSE, $path = FALSE) {
-function _nagios_versions_till_latest($core, $project = 'drupal', $float = FALSE, $path = FALSE) {
+function _nagios_versions_till_latest($core, $project = 'drupal', $path = FALSE) {
   
   if (!$path) {
     $path = 'http://updates.drupal.org/release-history/'. $project. '/'. $core;
@@ -240,12 +237,8 @@ function _nagios_versions_till_latest($core, $project = 'drupal', $float = FALSE
 	      drush_log('No recommended version available, taking latest release', 'warning');
 	      $xpath_releases = '/project/releases/release';
 	      $releases = $xml->xpath($xpath_releases);
-	      //$release = (array)$releases[0];	    
       }
-      
-      // new
-      
-      // slice array, use index of current version as length 
+      // truncate till current/used version and slice array, use index of current/used version as length 
       for($i = 0; $i < sizeof($releases); $i++) {
         $version = $releases[$i]->version;
         if ($version == drush_drupal_version()) {
@@ -265,6 +258,7 @@ function _nagios_versions_till_latest($core, $project = 'drupal', $float = FALSE
 	  );
   }  	
 }
+
 /** @} */
 
 /** Nagios functions
@@ -293,38 +287,31 @@ function _nagios_root() {
   else {
     $file = FALSE;
   }
-
-  // new
-  $between = _nagios_versions_between(drush_drupal_major_version(). '.x', 'drupal', FALSE, $file);
-    
-  return 1337;
-  // old
-
-
-  if ($recommended_version = _nagios_recommended_version(drush_drupal_major_version(). '.x', 'drupal', FALSE, $file)) {
-   
-    if ((float) drush_drupal_version() < (float) $recommended_version['version']) {
-      
-      $update_type = $recommended_version['terms']->term->value; 
-      if($update_type == 'Security update') {
+  if ($versions = _nagios_versions_till_latest(drush_drupal_major_version(). '.x', 'drupal', $file)) {
+    $recommended_version = $versions[0];
+    if ((float) drush_drupal_version() < (float) $recommended_version->version) {
+      $affected_versions = $update_type_indicator = array();
+      foreach($versions as $version) {
+        $update_type = $version->terms->term->value; 
+        $update_type_indicator[] = (string)$update_type; 
+        $affected_versions[] = $version->version . '(' . $update_type . ', '. date('Y-m-d', (int) $version->date) .', '.  $version->release_link . ')'; 
+      }
+      if (in_array('Security update', $update_type_indicator)) {
         $status_signal = dt('DRUPAL ROOT CRITICAL');
         $status_code = NAGIOS_CRITICAL;
       }
       else {
         $status_signal = dt('DRUPAL ROOT WARNING');
         $status_code = NAGIOS_WARNING;
-      }      
-            
+      }
       drush_print(  
-        dt('!status_signal - !version @ !drupal_root: drupal-!remcommended_version (!update_type) from !release-date available, see !release_link for details.',
+        dt('!status_signal - !version @ !drupal_root: recommended version is !remcommended_version. Affected versions between: !updates.',
           array(
             '!status_signal' => $status_signal, 
-            '!version'     => _nagios_current_version(), 
-          '!drupal_root' => drush_get_context('DRUSH_DRUPAL_ROOT'),
-            '!remcommended_version' => $recommended_version['version'],
-            '!update_type' => $update_type,
-            '!release-date' => date('Y-m-d\ H:i', $recommended_version['date']),
-            '!release_link' => $recommended_version['release_link'],       
+            '!version'     => drush_drupal_version(), 
+            '!drupal_root' => drush_get_context('DRUSH_DRUPAL_ROOT'),
+            '!remcommended_version' => $recommended_version->version,
+            '!updates' => implode(', ', $affected_versions),
           )
         )
       );
@@ -349,6 +336,8 @@ function _nagios_root() {
 
 /**
  * Monitores a single Drupal site for module and core updates  
+ *
+ * @todo Monitor for database updates
  *  
  * @return   
  * NAGIOS_OK (0) if monitored site is up to date

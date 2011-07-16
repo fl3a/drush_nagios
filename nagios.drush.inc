@@ -4,25 +4,8 @@ include_once 'includes/nagios.inc';
 
 /**
  * @file
- * The multi implementation.   
+ * The nagios implementation.   
  */
-
-/**
- * Implementation of hook_drush_init()
- * 
- * Check for needed drush_version.
- */
-function nagios_drush_init() {
-  $drush_version = array();
-  $drush_version = explode('-', DRUSH_VERSION);
-    
-  if ($drush_version[0] < 4.0) {
-    $drush_info = drush_read_drush_info();
-    if ($drush_version['datestamp'] < 1293480992) {
-      drush_log('Some command won`t work properly. You need a drush v. >=4.0[-dev -rc*] with a builddate newer or equal 27. Dec 2010 20:16:32 (1293480992).', 'warning');      
-    }
-  }  
-}
 
 /**
  * @defgroup drush_hooks Drush hooks
@@ -87,11 +70,10 @@ function nagios_drush_command() {
   // old
   $items['nagios'] = array(
     'callback' => 'drush_nagios',
-    'aliases' => array('mna', 'nagios'), 
     'description' => 'For the usage as nagios plugin: Monitores a Drupal installation or a Drupal site and print a message and return with an exit status.',
     'bootstrap' => DRUSH_BOOTSTRAP_DRUPAL_ROOT,
     'examples' => array(
-      'drush -r /path/to/drupal multi-nagios' =>
+      'drush -r /path/to/drupal nagios' =>
       "We assume that drupal-6.14 is the recommended release. (6.14 was a security update).\n" . 
       "With an older version, eg. drupal-6.13 we get:\n" .
       "'DRUPAL ROOT CRITICAL: drupal-6.13 @ /path/to/drupal/6.x\n" .
@@ -100,10 +82,10 @@ function nagios_drush_command() {
       "Or if we are running the recommended version:\n" .
       "' DRUPAL ROOT OK: drupal-6.14 @ /path/to/drupal/6.x is up to date.'\n" .
       "with exit status 0.",
-      'drush -r /path/to/drupal multi-nagios --file=/path/to/file' => 'Same as above with a specified file.',
-      'drush -r /path/to/drupal -l example.com multi-nagios' => 
+      'drush -r /path/to/drupal nagios --file=/path/to/file' => 'Same as above with a specified file.',
+      'drush -r /path/to/drupal -l example.com nagios' => 
       "Assuming we have got security updates, updates and a unsupported release of a module,\n" .
-      "it will print the following output and exit with MULTI_NAGIOS_CRITICAL (2) because of the security update:\n" .
+      "it will print the following output and exit with NAGIOS_CRITICAL (2) because of the security update:\n" .
       "DRUPAL SITE CRITICAL - example.com @ /path/to/drupal/6.x/sites/example.com:\n" .
       "SECURITY UPDATES available for image,lightbox2, Updates available for drupal,bueditor," .
       "imce, Installed version not supported: transliterations, see http://example.com/?q=admin/reports/updates for datails.\n" .
@@ -118,18 +100,19 @@ function nagios_drush_command() {
   );
   return $items;
 }
+/** @} */ /** End of defgroup drush_hooks */
 
 /**
- * Command callback for @ref multi_nagios_help
+ * Command callback
  * 
- * Calls _multi_nagios_site() if a valid site was supplied 
- * or _multi_nagios_root() if only the installation was supplied
+ * Calls _nagios_site() if a valid site was supplied 
+ * or _nagios_root() if only the installation was supplied
  * 
  * @return 
  * Exit status of the referenced function
  * 
- * @see _multi_nagios_root()
- * @see _multi_nagios_site() *  
+ * @see _nagios_root()
+ * @see _nagios_site()  
  */
 function drush_nagios() {
  
@@ -137,7 +120,7 @@ function drush_nagios() {
   $uri = drush_get_option(array('uri','l'));  
     
   if (!empty($uri)) {
-    return _multi_nagios_site();    
+    return _nagios_site();    
   }
   else {
     // multi nagios was called with -r/--root only
