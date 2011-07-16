@@ -289,7 +289,8 @@ function _nagios_root() {
   }
   if ($versions = _nagios_versions_till_latest(drush_drupal_major_version(). '.x', 'drupal', $file)) {
     $recommended_version = $versions[0];
-    if ((float) drush_drupal_version() < (float) $recommended_version->version) {
+    $current_version = (float) drush_drupal_version();
+    if ($current_version < (float) $recommended_version->version) {
       $affected_versions = $update_type_indicator = array();
       foreach($versions as $version) {
         $update_type = $version->terms->term->value; 
@@ -308,7 +309,7 @@ function _nagios_root() {
         dt('!status_signal - !version @ !drupal_root: recommended version is !remcommended_version. Affected versions between: !updates.',
           array(
             '!status_signal' => $status_signal, 
-            '!version'     => drush_drupal_version(), 
+            '!version'     => $current_version, 
             '!drupal_root' => drush_get_context('DRUSH_DRUPAL_ROOT'),
             '!remcommended_version' => $recommended_version->version,
             '!updates' => implode(', ', $affected_versions),
@@ -321,7 +322,7 @@ function _nagios_root() {
       drush_print(
         dt('DRUPAL ROOT OK - !version @ !drupal_root is uptodate.',
           array(
-          '!version' => _nagios_current_version(), 
+          '!version' => $current_version, 
           '!drupal_root' => drush_get_context('DRUSH_DRUPAL_ROOT'),           
           )
         )
