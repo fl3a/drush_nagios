@@ -295,7 +295,7 @@ function _nagios_root() {
       foreach($versions as $version) {
         $update_type = $version->terms->term->value; 
         $update_type_indicator[] = (string)$update_type; 
-        $affected_versions[] = $version->version . '(' . $update_type . ', '. date('Y-m-d', (int) $version->date) .', '.  $version->release_link . ')'; 
+        $affected_versions[] = $version->version . '(' . $update_type . ', '. date('Y-m-d', (int) $version->date) .', '.  $version->release_link . ' )'; 
       }
       if (in_array('Security update', $update_type_indicator)) {
         $status_signal = dt('DRUPAL ROOT CRITICAL');
@@ -306,7 +306,7 @@ function _nagios_root() {
         $status_code = NAGIOS_WARNING;
       }
       drush_print(  
-        dt('!status_signal - !version @ !drupal_root: recommended version is !remcommended_version. Affected versions between: !updates.',
+        dt('!status_signal - !version @ !drupal_root: recommended version is !remcommended_version. Affected versions between !version and !remcommended_version: !updates.',
           array(
             '!status_signal' => $status_signal, 
             '!version'     => $current_version, 
