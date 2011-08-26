@@ -359,11 +359,18 @@ function _nagios_site() {
     
   // Get update status information.
   ob_start();
-  $projects = _pm_get_update_info();
+  // Get installed extensions and projects.
+  $extensions = drush_get_extensions();
+  $projects = drush_get_projects($extensions);
+  
+  // Get update status information.
+  $update_info = _pm_get_update_info($projects);
   ob_end_clean();
   
   // Get name and type of update
-  foreach($projects as $project) {
+  foreach($update_info as $project) {
+    //drush_print_r($project);
+    //exit;
     switch (pm_update_filter($project)) {
       case dt('Update available') :
         $updates[] = $project['name'];
