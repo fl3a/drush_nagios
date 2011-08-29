@@ -360,11 +360,11 @@ function _nagios_site() {
   // Get update status information.
   ob_start();
   // Get installed extensions and projects.
-  $extensions = drush_get_extensions();
-  $projects = drush_get_projects($extensions);
+  $extensions = @drush_get_extensions();
+  $projects = @drush_get_projects($extensions);
   
   // Get update status information.
-  $update_info = _pm_get_update_info($projects);
+  $update_info = @_pm_get_update_info($projects);
   ob_end_clean();
   
   // Get name and type of update
