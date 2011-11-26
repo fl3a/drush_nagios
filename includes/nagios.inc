@@ -88,25 +88,29 @@ function _nagios_site() {
   
   $update_info = _nagios_get_update_info();
 
-  // Get project name and type of update
   foreach($update_info as $project) {
+
+    $update = $project['name'];
+
+    if (drush_get_option('show-versions')) {
+      $update .='(' . $project['existing_version'] . ' -> ' . $project['latest_version'] . ')';
+    }
+    if (drush_get_option('changelog')) {
+      $update .= '( ' . $project['releases'][$project['latest_version']]['release_link'] . ' )';
+    }
+
+    // Get project name and type of update
     switch (pm_update_filter($project)) {
       case dt('Update available') :
-  	(drush_get_option('changelog')) 
-          ? $updates[] = $project['name'] . '( ' . $project['releases'][$project['latest_version']]['release_link'] . ' )' 
-          : $updates[] = $project['name'];
+        $updates[] = $update;
         $updatable = TRUE;
         break;
       case dt('SECURITY UPDATE available'):
-  	(drush_get_option('changelog')) 
-          ? $security_updates[] = $project['name'] . '( ' . $project['releases'][$project['latest_version']]['release_link'] . ' )' 
-          : $security_updates[] = $project['name'];
+        $security_updates[] = $update;
         $updatable = TRUE;
         break;
       case dt('Installed version not supported'):
-  	(drush_get_option('changelog')) 
-          ? $not_supported[] = $project['name'] . '( ' . $project['releases'][$project['latest_version']]['release_link'] . ' )' 
-          : $not_supported[] = $project['name'];
+  	    $not_supported[] = $update;
         $updatable = TRUE;
         break;
     }    
