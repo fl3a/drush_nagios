@@ -51,8 +51,6 @@ function _nagios_get_update_info() {
   $update_info = @_pm_get_update_info($projects);
   ob_end_clean();
   
-  drush_print_r($update_info);
-  die;
   return $update_info;
 }
 
