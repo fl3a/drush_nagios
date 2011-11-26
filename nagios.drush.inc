@@ -23,29 +23,18 @@ include_once 'includes/nagios.inc';
 function nagios_drush_help($section) {
   switch ($section) {
     case 'drush:nagios':
-      return 'For the usage as nagios plugin: Monitores a Drupal installation or a Drupal site and print a message and return with an exit status.
+      return 'For the usage as nagios plugin: Monitores a Drupal site and print a message and return with an exit status.
 
-Monitoring of a Drupal installation
-multi_nagios could be run on the with -r /--root supplied Drupal installation to check for core updates.
-
-If the Drupal installation is not up to date, this command prints the recommended version, the type of the update (Bug fixes or Security update), the release date and the link to the release note of the recommended version.
-
-Exit status
-
-MULTI_NAGIOS_OK (0) if monitored Drupal is up to date
-or MULTI_NAGIOS_WARNING (1) if there is a \'Bug fixes\' available
-or MULTI_NAGIOS_CRITICAL(2) if there is a \'Security update\' available
-
-Monitoring of a Drupal site
 Checks on the the with -l / --uri supplied site for core and module updates.
 
 If the Drupal site is not up to date, this command will print the type of the update(Security update, update, unsupported release) including the corresponding modules, drupal core and a link to the \'Available updates\' page within drupal.
 
+
 Exit status
 
-MULTI_NAGIOS_OK (0) if monitored site is up to date
-or MULTI_NAGIOS_WARNING (1) if there are updates or unsupported modules available
-or MULTI_NAGIOS_CRITICAL(2) if there are Security updates available';      
+* MULTI_NAGIOS_OK (0) if monitored Drupal site is up to date
+* MULTI_NAGIOS_WARNING (1) if there is a \'Bug fix\'/Update available
+* MULTI_NAGIOS_CRITICAL(2) if there is a \'Security update\' available';      
   }
 }
 
@@ -58,16 +47,6 @@ or MULTI_NAGIOS_CRITICAL(2) if there are Security updates available';
 function nagios_drush_command() {
   $items = array();
 
-  $items['nagios-core'] = array(
-  );
-  $items['nagios-modules'] = array(
-
-  );
-  $items['nagios-db'] = array(
- 
-  );
-
-  // old
   $items['nagios'] = array(
     'callback' => 'drush_nagios',
     'description' => 'For the usage as nagios plugin: Monitores a Drupal installation or a Drupal site and print a message and return with an exit status.',
@@ -93,9 +72,8 @@ function nagios_drush_command() {
       "DRUPAL SITE OK - example.com @ /path/to/drupal/6.x/sites/example.com: Everything is up to date."
      ), 
     'options' => array(
-      '--file' => "Path to release information file, this could be a (temp) file  to avoid nrpe-socket timeouts.\n" .
-      "It is also possible to supply path via URI, like http://updates.drupal.org/release-history/drupal/6.x.\n" .
-      "NOTE: This option is only available for checking the Drupal installation."
+      '--changelog' => 'Show changelog of affected parts.',
+      '--db-updates' => 'Show pending database updates.',
     ),    
   );
   return $items;
