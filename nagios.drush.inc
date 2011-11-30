@@ -73,7 +73,9 @@ function nagios_drush_command() {
      ), 
     'options' => array(
       '--changelog' => 'Show changelog of affected parts.',
-      '--db-updates' => 'Show pending database updates.',
+      '--show-versions' => 'Show used and recommended versions.',
+      '--ignore' => 'Comma seperated list of projects which should be ignored, useful for patched, modified projects etc.',
+      /** @todo '--db-updates' => 'Show pending database updates.', */
     ),    
   );
   return $items;
