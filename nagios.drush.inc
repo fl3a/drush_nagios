@@ -32,9 +32,9 @@ If the Drupal site is not up to date, this command will print the type of the up
 
 Exit status
 
-* MULTI_NAGIOS_OK (0) if monitored Drupal site is up to date
-* MULTI_NAGIOS_WARNING (1) if there is a \'Bug fix\'/Update available
-* MULTI_NAGIOS_CRITICAL(2) if there is a \'Security update\' available';      
+* NAGIOS_OK (0) if monitored Drupal site is up to date
+* NAGIOS_WARNING (1) if there is a \'Bug fix\'/Update available
+* NAGIOS_CRITICAL(2) if there is a \'Security update\' available';      
   }
 }
 
@@ -50,7 +50,7 @@ function nagios_drush_command() {
   $items['nagios'] = array(
     'callback' => 'drush_nagios',
     'description' => 'For the usage as nagios plugin: Monitores a Drupal installation or a Drupal site and print a message and return with an exit status.',
-    'bootstrap' => DRUSH_BOOTSTRAP_DRUPAL_ROOT,
+    'bootstrap' => DRUSH_BOOTSTRAP_DRUPAL_SITE,
     'examples' => array(
       'drush -r /path/to/drupal nagios' =>
       "We assume that drupal-6.14 is the recommended release. (6.14 was a security update).\n" . 
@@ -72,9 +72,9 @@ function nagios_drush_command() {
       "DRUPAL SITE OK - example.com @ /path/to/drupal/6.x/sites/example.com: Everything is up to date."
      ), 
     'options' => array(
-      '--changelog' => 'Show changelog of affected parts.',
-      '--show-versions' => 'Show used and recommended versions.',
-      '--ignore' => 'Comma seperated list of projects which should be ignored, useful for patched, modified projects etc.',
+      '--changelog' => 'Show release link / link to changelog for the recommended version of a affected projects.',
+      '--show-versions' => 'Show used / current and recommended versions for a affected project..',
+      '--ignore' => 'Comma seperated list of projects which should be ignored, useful for patched, modified modules etc.',
       /** @todo '--db-updates' => 'Show pending database updates.', */
     ),    
   );

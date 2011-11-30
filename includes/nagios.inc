@@ -20,6 +20,7 @@ define('NAGIOS_WARNING', 1);
 
 /** Status 2 for nagios critical @see _NAGIOS_site() and _NAGIOS_root() */
 define('NAGIOS_CRITICAL', 2);
+
 /** @} */ /** End of defgroup exit_status */
  
 /**
