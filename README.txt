@@ -9,6 +9,8 @@
 INTRODUCTION
 ------------
 
+The drush extension let you monitor your drupal sites via nagios or icinga for updates.  
+
 Current Maintainer: Florian "fl3a" Latzel <http://drupal.org/user/51103> 
 Original Sponsor: ISL Individuelle System Lösungen <http://is-loesungen.de>
 
@@ -38,9 +40,7 @@ You can put your drush command file in a number of places:
 DOCUMENTATION
 -------------
 
-Each multi command got a help.
-  
-To get specific help, type:
+The nagios command got a help, type:
 drush help nagios
 
 Since the the code is extensively commented  
