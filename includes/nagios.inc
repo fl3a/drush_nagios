@@ -54,15 +54,6 @@ function _nagios_get_update_info() {
   return $update_info;
 }
 
-/**
- * @return $updates
- */
-function _nagios_parse_update_info($update_info) {
-
-}
-
-
-
 
 /** @}*/
 
