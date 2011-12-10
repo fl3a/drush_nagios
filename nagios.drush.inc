@@ -83,38 +83,24 @@ function nagios_drush_command() {
 /** @} */ /** End of defgroup drush_hooks */
 
 /**
+ * @defgroup drush_callbacks Drush callbacks
+ * Implementation of general drush hooks
+ * @{  
+ */
+
+/**
  * Command callback
  * 
- * Calls _nagios_site() if a valid site was supplied 
- * or _nagios_root() if only the installation was supplied
+ * Calls _nagios_site() 
  * 
  * @return 
  * Exit status of the referenced function
  * 
- * @see _nagios_root()
  * @see _nagios_site()  
  */
 function drush_nagios() {
- 
-  // get -l/--uri option
-  $uri = drush_get_option(array('uri','l'));  
-    
-  if (!empty($uri)) {
-    return _nagios_site();    
-  }
-  else {
-    // multi nagios was called with -r/--root only
-    return _nagios_root();
-  }
+  return _nagios_site();    
 }
 
 /** @} */ /** End of defgroup callbacks */
 
-/**
- * @defgroup commands
- * Commands as defined in nagios_drush_command()
- * @{  
- */
-
- 
-/** @} */ /** End of defgroup commands */
