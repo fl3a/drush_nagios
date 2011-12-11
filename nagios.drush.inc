@@ -84,7 +84,7 @@ function nagios_drush_command() {
 
 /**
  * @defgroup drush_callbacks Drush callbacks
- * Implementation of general drush hooks
+ * Implementation of general drush callbacks
  * @{  
  */
 
