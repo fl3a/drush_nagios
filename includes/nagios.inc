@@ -43,21 +43,24 @@ function _nagios_get_update_info() {
   drush_include_engine('update_info', 'drupal', NULL, DRUSH_BASE_PATH . '/commands/pm/update_info');
   include(DRUSH_BASE_PATH . '/commands/pm/updatecode.pm.inc');
 
-  $updatable = FALSE;
-  $updates = $security_updates = $not_supported = array();
-
   drush_bootstrap_max();
 
   // Get update status information.
   ob_start();
   // Get installed extensions and projects.
+  ob_start();
   $extensions = @drush_get_extensions();
-  $projects = @drush_get_projects($extensions);
-
-  // Get update status information.
-  $update_info = @_pm_get_update_info($projects);
   ob_end_clean();
   
+  ob_start();
+  $projects = @drush_get_projects($extensions);
+  ob_end_clean();
+
+  // Get update status information.
+  ob_start();
+  $update_info = @_pm_get_update_info($projects);
+  ob_end_clean();
+ 
   return $update_info;
 }
 
@@ -213,23 +216,8 @@ function _nagios_parse_update_info($update_info) {
  *
  * Print a message for nagios 
  */
-function _nagios_print_message($update_info) {
+function _nagios_print_message($parsed_update_info) {
   
-  $updatable = FALSE;
-    
-  $updates = _nagios_parse_update_info($update_info);
- 
-  // debug
-  drush_print_r($updates); // all
-  //drush_print_r(array_keys($updates['updates'])); // only type update
-  //drush_print(implode(',',array_keys($updates['updates']))); // comma seperated
-
-  if ($updates['has_updates']) {
-    $updatable = TRUE;    
-  }
-  
-  //die();
-
   // Get uri for Available updates
   switch (drush_drupal_major_version()) {
     case 5:
@@ -242,9 +230,9 @@ function _nagios_print_message($update_info) {
   }
   
   // Build updates message
-  if($updatable) {
-    
-    unset($updates['has_updates']);
+  if ($parsed_update_info['has_updates']) {
+   
+    unset($parsed_update_info['has_updates']);
     
     $status_msg = dt('!uri @ !site_root: ',
       array(
@@ -253,7 +241,7 @@ function _nagios_print_message($update_info) {
       )
     );
 
-    foreach ($updates as $key => $projects){
+    foreach ($parsed_update_info as $key => $projects){
       if ($key == 'ignored' || drush_get_option('changelog') || drush_get_option('show-versions')) {
         foreach ($projects as $name => $project) {
           if ($key == 'ignored'){
@@ -361,24 +349,38 @@ function _nagios_print_message($update_info) {
   }  
   */
     
-  // Print message and exit with status
+  // Print message
+  drush_print(__FUNCTION__);
   drush_print($status_msg);  
-  return $status_code;  
 }
 
 
 /**
  * Return exit status for nagios
  *
- * @param array $update_info 
+ * @param array $parsed_update_info 
  * 
  * @return int  
  *   NAGIOS_OK (0) if monitored site is up to date, 
  *   NAGIOS_WARNING (1) if there are updates or unsupported modules available or 
  *   NAGIOS_CRITICAL(2) if there are security updates available
  */
-function _nagios_exit_status($update_info) {
-    
+function _nagios_exit_status($parsed_update_info) {
+  
+  if ($parsed_update_info['has_updates']) {
+    $security_updates = (count($parsed_update_info['security_updates']) != 0);
+    $updates = (count($parsed_update_info['security_updates']) != 0);
+    $not_supported = (count($parsed_update_info['not_supported']) != 0);
+    if ($security_updates) {
+      return NAGIOS_CRITICAL;
+    }
+    elseif ($updates || $not_supported) {
+      return NAGIOS_WARNING;
+    }    
+  }  
+  else {
+    return NAGIOS_OK;
+  }
 } 
 
 /** @} */ /** End of defgroup nagios */

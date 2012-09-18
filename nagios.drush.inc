@@ -90,14 +90,17 @@ function nagios_drush_command() {
 
 /**
  * Command callback
+ * 
+ * Print out nag
  *
  * @return int 
- *   Exit status of the referenced function
+ *   Exit status of the referenced functionn
  */
 function drush_nagios() {
   $update_info = _nagios_get_update_info();
-  _nagios_print_message($update_info);
-  return _nagios_exit_status($update_status);    
+  $parsed_update_info = _nagios_parse_update_info($update_info);
+  _nagios_print_message($parsed_update_info);
+  return _nagios_exit_status($parsed_update_status);    
 }
 
 /** @} */ /** End of defgroup callbacks */
