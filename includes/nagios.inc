@@ -228,24 +228,33 @@ function _nagios_print_message($parsed_update_info) {
       $updates_path = '/?q=admin/reports/updates';
       break;
   }
+
+  // Message prefix
+  $status_msg = dt('!uri @ !site_root: ',
+    array(
+      '!uri'      => drush_get_context('DRUSH_URI'),
+      '!site_root'=> drush_get_context('DRUSH_DRUPAL_ROOT') . '/' . drush_get_context('DRUSH_DRUPAL_SITE_ROOT'),
+    )
+  );
   
   // Build updates message
   if ($parsed_update_info['has_updates']) {
    
-    unset($parsed_update_info['has_updates']);
+    unset($parsed_update_info['has_updates']);    
     
-    $status_msg = dt('!uri @ !site_root: ',
-      array(
-        '!uri'      => drush_get_context('DRUSH_URI'),
-        '!site_root'=> drush_get_context('DRUSH_DRUPAL_ROOT') . '/' . drush_get_context('DRUSH_DRUPAL_SITE_ROOT'),
-      )
-    );
-
+     // Traverse serverities
     foreach ($parsed_update_info as $key => $projects){
+      
+      // Skip empty serverities
+      if (count($projects) == 0) {
+        break;
+      }
+      
+      // Append extra information to projects if option or ignored module
       if ($key == 'ignored' || drush_get_option('changelog') || drush_get_option('show-versions')) {
         foreach ($projects as $name => $project) {
-          if ($key == 'ignored'){
-            
+          // Add serverity to ignored Projects
+          if ($key == 'ignored'){           
             
           }
           $status_msg .= dt(' !type: !modules',
@@ -265,6 +274,9 @@ function _nagios_print_message($parsed_update_info) {
         );     
       }
     }
+  }
+  else {
+    // Everythings ok message...
   }
  
   // Print message
