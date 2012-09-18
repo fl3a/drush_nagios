@@ -49,7 +49,7 @@ function nagios_drush_command() {
 
   $items['nagios'] = array(
     'callback' => 'drush_nagios',
-    'description' => 'For the usage as nagios plugin: Monitores a Drupal installation or a Drupal site and print a message and return with an exit status.',
+    'description' => 'For the usage as nagios plugin: Monitores a Drupal site and print a message and return with an exit status.',
     'bootstrap' => DRUSH_BOOTSTRAP_DRUPAL_SITE,
     'examples' => array(
       'drush -r /path/to/drupal nagios' =>
@@ -90,16 +90,14 @@ function nagios_drush_command() {
 
 /**
  * Command callback
- * 
- * Calls _nagios_site() 
- * 
- * @return 
- * Exit status of the referenced function
- * 
- * @see _nagios_site()  
+ *
+ * @return int 
+ *   Exit status of the referenced function
  */
 function drush_nagios() {
-  return _nagios_site();    
+  $update_info = _nagios_get_update_info();
+  _nagios_print_message($update_info);
+  return _nagios_exit_status($update_status);    
 }
 
 /** @} */ /** End of defgroup callbacks */
