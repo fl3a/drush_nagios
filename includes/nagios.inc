@@ -266,91 +266,8 @@ function _nagios_print_message($parsed_update_info) {
       }
     }
   }
-    
-    /*
-    // CRITICAL / SECURITY UPDATES
-    if (!empty($updates['security_updates'])) {
-      $status_msg = dt('DRUPAL SITE CRITICAL - !uri @ !site_root: ', 
-        array(
-        '!uri'      => drush_get_context('DRUSH_URI'),
-        '!site_root'=> drush_get_context('DRUSH_DRUPAL_ROOT') . '/' . drush_get_context('DRUSH_DRUPAL_SITE_ROOT'),            
-        )
-      );
-      $status_msg .= dt('SECURITY UPDATES available for !modules', 
-        array(
-          '!modules' => implode(',', array_keys($updates['security_updates'])),
-        )
-      );
-      // UPDATES / BUG FIXES
-      if (!empty($updates['updates'])) {
-        $status_msg .= dt(', UPDATES available for !modules', 
-          array(
-          '!modules' => implode(',', array_keys($updates['updates'])),
-          )
-        );          
-      }
-      // NOT SUPPORTED MODULES
-      if (!empty($updates['not_supported'])) {
-        $status_msg .= dt(', Installed version not supported: !modules',
-          array(
-            '!module' => implode(',', array_keys($updates['not_supported']))  ,
-          )
-        );  
-      }
-      $status_msg .= dt(', see http://!update_uri for details.', 
-        array(
-          '!update_uri' => drush_get_context('DRUSH_URI') . $updates_path          
-        )
-      );
-      $status_code = NAGIOS_CRITICAL;
-    }
-    // WARNING / Updates or Unsupported modules
-    else if (!empty($updatable) || !empty($not_supported)) {
-      $status_msg = dt('DRUPAL SITE WARNING - !uri @ !site_root: ', 
-        array(
-        '!uri'      => drush_get_context('DRUSH_URI'),
-        '!site_root'=> drush_get_context('DRUSH_DRUPAL_ROOT') . '/' . drush_get_context('DRUSH_DRUPAL_SITE_ROOT'),            
-        )
-      );
-      if (!empty($updates)) {
-        $status_msg .= dt('Updates available for !modules', 
-          array(
-          '!modules' => implode(',', $updates)
-          )
-        );          
-      }
-      if (!empty($not_supported)) {
-        if (!empty($updates)) {
-          $status_msg .= ', ';
-        }
-        $status_msg .= dt('Installed version not supported: !modules',
-          array(
-            '!module' => implode(',', $not_supported)
-          )
-        );  
-      }
-      $status_msg .= dt(', see http://!update_uri for details.', 
-        array(
-          '!update_uri' => drush_get_context('DRUSH_URI') . $updates_path          
-        )
-      );
-      $status_code = NAGIOS_WARNING;
-    }
-  }
-  else {  
-    // OK / No updates
-    $status_msg =  dt('DRUPAL SITE OK - !uri @ !site_root: Everything is uptodate.',
-      array(
-        '!uri'      => drush_get_context('DRUSH_URI'),
-        '!site_root'=> drush_get_context('DRUSH_DRUPAL_ROOT') . '/' . drush_get_context('DRUSH_DRUPAL_SITE_ROOT'),
-      )
-    );
-    $status_code = NAGIOS_OK;
-  }  
-  */
-    
+ 
   // Print message
-  drush_print(__FUNCTION__);
   drush_print($status_msg);  
 }
 
@@ -371,6 +288,7 @@ function _nagios_exit_status($parsed_update_info) {
     $security_updates = (count($parsed_update_info['security_updates']) != 0);
     $updates = (count($parsed_update_info['security_updates']) != 0);
     $not_supported = (count($parsed_update_info['not_supported']) != 0);
+    
     if ($security_updates) {
       return NAGIOS_CRITICAL;
     }
