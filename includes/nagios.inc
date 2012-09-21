@@ -43,8 +43,7 @@ function _nagios_get_update_info() {
   drush_include_engine('update_info', 'drupal', NULL, DRUSH_BASE_PATH . '/commands/pm/update_info');
   include(DRUSH_BASE_PATH . '/commands/pm/updatecode.pm.inc');
 
-  drush_bootstrap_max();
-
+  drush_bootstrap_max();  
   // Get update status information.
   ob_start();
   // Get installed extensions and projects.
@@ -59,9 +58,8 @@ function _nagios_get_update_info() {
   // Get update status information.
   ob_start();
   $update_info = @_pm_get_update_info($projects);
-  ob_end_clean();
- 
-  return $update_info;
+  ob_end_clean();  
+  return $update_info;  
 }
 
 /**
@@ -151,12 +149,17 @@ function _nagios_get_update_info() {
 function _nagios_parse_update_info($update_info) {
 
   $updates = array();
+  // Update indicator 
   $updates['has_updates'] = FALSE;
+  // Serverities  
   $updates['updates'] = array();
   $updates['security_updates'] = array();
   $updates['not_suported'] = array();
   $updates['ignored'] = array();  
-
+  $updates['update_not_checked'] = array();
+  $updates['update_revorked'] = array();
+  $updates['unknown'] = array();  
+  
   $ignore = array();
   $ignore = explode(',', drush_get_option('ignore'));
   
@@ -172,11 +175,15 @@ function _nagios_parse_update_info($update_info) {
 
     // Create array to append it later
     $update = array();
-    $update['project_type']     =  $project['project_type'];
+    $update['project_type'] =  $project['project_type'];
     $update['existing_version'] =  $project['existing_version'];
-    $update['latest_version']   =  $project['latest_version'];
-    $update['release_link']     =  $project['releases'][$project['latest_version']]['release_link'];
-    $update['serverity']        =  dt($update_type);
+    
+    // Skip building array on these serverities...
+    if ($update_type != dt('Unknown') || $update_type != dt('Unable to check status')) {
+      $update['latest_version'] =  $project['latest_version'];
+      $update['release_link'] =  $project['releases'][$project['latest_version']]['release_link'];
+      $update['serverity'] =  dt($update_type);
+    }
 
     // Add project to $updates['ignored'] and skip this loop iteration
     if (in_array($project_name, $ignore)) {
@@ -198,6 +205,17 @@ function _nagios_parse_update_info($update_info) {
   	    $updates['not_supported'][$project_name] = $update;
         $updates['has_updates'] = TRUE;
         break;
+      case dt('Unable to check status'):
+        $updates['update_not_checked'][$project_name] = $update;
+        break;
+      case dt('Installed version REVOKED'):
+        $updates['update_revorked'][$project_name] = $update;
+        $updates['has_updates'] = TRUE;        
+        break;  
+      default:
+        $updates['unknown'][$project_name] = $update;
+        break;
+              
     }        
   }
   return $updates;
