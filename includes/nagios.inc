@@ -155,10 +155,10 @@ function _nagios_parse_update_info($update_info) {
   // Serverities  
   $updates['updates'] = array();
   $updates['security_updates'] = array();
-  $updates['not_suported'] = array();
+  $updates['not_supported'] = array();
   $updates['ignored'] = array();  
   $updates['update_not_checked'] = array();
-  $updates['update_revorked'] = array();
+  $updates['update_revoked'] = array();
   $updates['unknown'] = array();  
   
   $ignore = array();
@@ -213,6 +213,9 @@ function _nagios_parse_update_info($update_info) {
         $updates['update_revorked'][$project_name] = $update;
         $updates['has_updates'] = TRUE;        
         break;  
+      case dt('Up to date'):
+        $updates['up_to_date'][$project_name] = $update;
+        break; 
       default:
         $updates['unknown'][$project_name] = $update;
         break;
@@ -237,21 +240,9 @@ function _nagios_parse_update_info($update_info) {
  */
 function _nagios_print_message($parsed_update_info) {
   
-  // Get uri for Available updates
-  switch (drush_drupal_major_version()) {
-    case 5:
-      $updates_path = '/?q=admin/logs/updates';
-      break;
-    case 6:
-    case 7:
-      $updates_path = '/?q=admin/reports/updates';
-      break;
-  }
-
   // Message prefix
-  $status_msg = dt('!uri @ !site_root: ',
+  $status_msg = dt('!site_root: ',
     array(
-      '!uri'      => drush_get_context('DRUSH_URI'),
       '!site_root'=> drush_get_context('DRUSH_DRUPAL_ROOT') . '/' . drush_get_context('DRUSH_DRUPAL_SITE_ROOT'),
     )
   );
@@ -262,32 +253,29 @@ function _nagios_print_message($parsed_update_info) {
     unset($parsed_update_info['has_updates']);    
     
      // Traverse serverities
-    foreach ($parsed_update_info as $key => $projects){
+    foreach ($parsed_update_info as $serverity => $projects){
       
-      // Skip empty serverities
-      if (count($projects) == 0) {
-        break;
+      // Skip empty and uneeded serverities
+      if (count($projects) == 0 || $serverity == 'up_to_date' || $serverity == 'unknown') {
+        continue;
       }
-      
-      // Append extra information to projects if option or ignored module
-      if ($key == 'ignored' || drush_get_option('changelog') || drush_get_option('show-versions')) {
+      $ignored = array();
+      if ($serverity == 'ignored') {
         foreach ($projects as $name => $project) {
-          // Add serverity to ignored Projects
-          if ($key == 'ignored'){           
-            
-          }
-          $status_msg .= dt(' !type: !modules',
-            array(
-              '!type' => strtoupper(str_replace('_', ' ', $key)),
-              '!modules' => implode(',', array_keys($projects)),
-            )
-          );        
+          drush_print($name);
+          drush_print_r($project);
+          $ignored[] = $name . '(' . $project['serverity'] . ')';
         }
+        $status_msg .= dt(' IGNORED BY SETTINGS: !modules',
+          array(
+            '!modules' => implode(',', $ignored),
+          )
+        );        
       }
       else {
         $status_msg .= dt(' !type: !modules',
           array(
-            '!type' => strtoupper(str_replace('_', ' ', $key)),
+            '!type' => strtoupper(str_replace('_', ' ', $serverity)),
             '!modules' => implode(',', array_keys($projects)),
           )
         );     
@@ -295,7 +283,7 @@ function _nagios_print_message($parsed_update_info) {
     }
   }
   else {
-    // Everythings ok message...
+    $status_msg = $status_msg . dt('Everythings OK...');
   }
  
   // Print message
