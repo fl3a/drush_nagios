@@ -40,25 +40,26 @@ define('NAGIOS_CRITICAL', 2);
  * @see _pm_get_update_info()
  */
 function _nagios_get_update_info() {
+
   drush_include_engine('update_info', 'drupal', NULL, DRUSH_BASE_PATH . '/commands/pm/update_info');
   include(DRUSH_BASE_PATH . '/commands/pm/updatecode.pm.inc');
 
   drush_bootstrap_max();  
-  // Get update status information.
-  ob_start();
   // Get installed extensions and projects.
-  ob_start();
-  $extensions = @drush_get_extensions();
-  ob_end_clean();
-  
-  ob_start();
-  $projects = @drush_get_projects($extensions);
-  ob_end_clean();
+  $extensions = drush_get_extensions();
+  $projects = drush_get_projects($extensions);
+
+  // Set quiet due getting update status information produces unwanted output.
+  drush_set_option('quiet', 1, 'all');
+  drush_set_context('DRUSH_QUIET', 1);
 
   // Get update status information.
-  ob_start();
-  $update_info = @_pm_get_update_info($projects);
-  ob_end_clean();  
+  $update_info = _pm_get_update_info($projects);
+  
+  // Unset quiet.
+  drush_set_option('quiet', 0, 'all');
+  drush_set_context('DRUSH_QUIET', 0);
+  
   return $update_info;  
 }
 
@@ -313,7 +314,7 @@ function _nagios_print_message($parsed_update_info) {
  *   NAGIOS_CRITICAL(2) if there are security updates available
  */
 function _nagios_exit_status($parsed_update_info) {
-  
+
   if ($parsed_update_info['has_updates']) {
     $security_updates = (count($parsed_update_info['security_updates']) != 0);
     $updates = (count($parsed_update_info['security_updates']) != 0);
