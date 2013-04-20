@@ -72,9 +72,13 @@ function nagios_drush_command() {
       "DRUPAL SITE OK - example.com @ /path/to/drupal/6.x/sites/example.com: Everything is up to date."
      ), 
     'options' => array(
-      '--changelog' => 'Show release link / link to changelog for the recommended version of a affected projects.',
-      '--show-versions' => 'Show used / current and recommended versions for a affected project..',
-      '--ignore' => 'Comma seperated list of projects which should be ignored, useful for patched, modified modules etc.',
+      //'changelog' => 'Show release link / link to changelog for the recommended version of a affected projects.',
+      //'show-versions' => 'Show used / current and recommended versions for a affected project..',
+      'ignore' => array(
+        'description' => 'Comma seperated list of projects which should be ignored, useful for patched, modified modules etc.',
+        'value' => 'required',
+        'example-value' => 'project1,...,projectN',
+      ),
       /** @todo '--db-updates' => 'Show pending database updates.', */
     ),    
   );
@@ -100,7 +104,7 @@ function drush_nagios() {
   $update_info = _nagios_get_update_info();
   $parsed_update_info = _nagios_parse_update_info($update_info);
   _nagios_print_message($parsed_update_info);
-  return _nagios_exit_status($parsed_update_status);    
+  return _nagios_exit_status($parsed_update_info);    
 }
 
 /** @} */ /** End of defgroup callbacks */
