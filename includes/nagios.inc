@@ -300,8 +300,6 @@ function _nagios_print_message($parsed_update_info) {
       $ignored = array();
       if ($serverity == 'ignored') {
         foreach ($projects as $name => $project) {
-          drush_print($name);
-          drush_print_r($project);
           $ignored[] = $name . '(' . $project['serverity'] . ')';
         }
         $status_msg .= dt(' IGNORED BY SETTINGS: !modules',
