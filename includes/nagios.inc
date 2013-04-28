@@ -333,9 +333,9 @@ function _nagios_print_message($parsed_update_info) {
  * @param array $parsed_update_info 
  * 
  * @return int  
- *   NAGIOS_OK (0) if monitored site is up to date, 
- *   NAGIOS_WARNING (1) if there are updates or unsupported modules available or 
- *   NAGIOS_CRITICAL(2) if there are security updates available
+ *   - NAGIOS_OK (0) if monitored site is up to date, 
+ *   - NAGIOS_WARNING (1) if there are updates or unsupported modules available or 
+ *   - NAGIOS_CRITICAL(2) if there are security updates available
  */
 function _nagios_exit_status($parsed_update_info) {
 
