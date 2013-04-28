@@ -67,24 +67,35 @@ function _nagios_get_update_info() {
  * Parses supplied update info and get type of update and corresponding informations
  *
  * @param array $update_info
- *   Array, update informations
+ *   Update information
  *
  * @return array
+ *   An array with an update indicator 'has_updates' (boolean) 
+ *   and keyed on the following serverities which contain the corresponding projects
+ *   - updates
+ *   - security_updates
+ *   - not_supported
+ *   - ignored (ignore Option)
+ *   - update_not_checked
+ *   - update_revoked
+ *   - up_to_date
+ *   - unknown 
+ *
+ *  Projects array keys
+ *  - project_type
+ *  - existing_version
+ *  - latest_version
+ *  - release_link
+ *  - serverity
+ *
+ * Example called with --ignore=cnr,devel :
+ *
  * @code
  * Array
  * (
  *    [has_updates] => 1
  *    [updates] => Array
  *         (
- *             [drupal] => Array
- *                (
- *                    [project_type] => core
- *                    [existing_version] => 7.8
- *                    [latest_version] => 7.9
- *                    [release_link] => http://drupal.org/node/1322736
- *                    [serverity] => Aktualisierung verfügbar
- *                )
- * 
  *            [mimemail] => Array
  *                (
  *                    [project_type] => module
@@ -117,8 +128,20 @@ function _nagios_get_update_info() {
  *                )
  * 
  *        )
- * 
- *    [not_suported] => Array
+ *
+ *    [not_supported] => Array
+ *        (
+ *        )
+ *
+ *    [ignored] => Array
+ *        (
+ *        )
+ *
+ *    [update_not_checked] => Array
+ *        (
+ *        )
+ *
+ *    [update_revoked] => Array
  *        (
  *        )
  * 
@@ -143,15 +166,29 @@ function _nagios_get_update_info() {
  *                )
  * 
  *        )
+ *    [up_to_date] => Array
+ *        (
+ *             [drupal] => Array
+ *                (
+ *                    [project_type] => core
+ *                    [existing_version] => 7.9
+ *                    [latest_version] => 7.9
+ *                    [release_link] => http://drupal.org/node/1322736
+ *                    [serverity] => Aktualisierung verfügbar
+ *                )
  * 
+ *        )
+ *
  *)
  *@endcode 
  */
 function _nagios_parse_update_info($update_info) {
 
   $updates = array();
+  
   // Update indicator 
   $updates['has_updates'] = FALSE;
+  
   // Serverities  
   $updates['updates'] = array();
   $updates['security_updates'] = array();
@@ -159,6 +196,7 @@ function _nagios_parse_update_info($update_info) {
   $updates['ignored'] = array();  
   $updates['update_not_checked'] = array();
   $updates['update_revoked'] = array();
+  $updates['up_to_date'] = array();
   $updates['unknown'] = array();  
   
   $ignore = array();
