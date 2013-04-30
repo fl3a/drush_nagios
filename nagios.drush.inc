@@ -45,7 +45,7 @@ Exit status
 function nagios_drush_command() {
   $items = array();
 
-  $items['nagios'] = array(
+  $items['check-updates'] = array(
     'callback' => 'drush_nagios',
     'description' => 'For the usage as nagios plugin: Monitores a Drupal site and print a message and return with an exit status.',
     'bootstrap' => DRUSH_BOOTSTRAP_DRUPAL_SITE,
@@ -77,8 +77,21 @@ function nagios_drush_command() {
         'value' => 'required',
         'example-value' => 'project1,...,projectN',
       ),
-      /** @todo '--db-updates' => 'Show pending database updates.', */
-    ),    
+    ),
+  );
+  $items['check-db-updates'] = array(
+    'callback' => '',
+    'description' => 'Checks for pending database updates.',
+    'bootstrap' => DRUSH_BOOTSTRAP_DRUPAL_SITE,
+    'examples' => array(
+      'command' => 'description',
+    ),
+    'options' => array(
+      'show-updates' => array(
+        'description' => 'Show pending database updates.',
+        'value' => 'optional',
+      ),
+    ),
   );
   return $items;
 }
