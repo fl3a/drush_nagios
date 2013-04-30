@@ -25,16 +25,14 @@ function nagios_drush_help($section) {
     case 'drush:nagios':
       return 'For the usage as nagios plugin: Monitores a Drupal site and print a message and return with an exit status.
 
-Checks on the the with -l / --uri supplied site for core and module updates.
-
-If the Drupal site is not up to date, this command will print the type of the update(Security update, update, unsupported release) including the corresponding modules, drupal core and a link to the \'Available updates\' page within drupal.
-
+Checks a Drupal site for \'regular\' (core and contrib) and pending database updates, 
+print a status message and exit with exit status.
 
 Exit status
 
-* NAGIOS_OK (0) if monitored Drupal site is up to date
-* NAGIOS_WARNING (1) if there is a \'Bug fix\'/Update available
-* NAGIOS_CRITICAL(2) if there is a \'Security update\' available';      
+* NAGIOS_OK (0)      - if monitored Drupal site is up to date
+* NAGIOS_WARNING (1) - if there is a regular or pending database update available
+* NAGIOS_CRITICAL(2) - if there is a \'Security update\' available';      
   }
 }
 
