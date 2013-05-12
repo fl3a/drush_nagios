@@ -80,17 +80,11 @@ function nagios_drush_command() {
     ),
   );
   $items['check-db-updates'] = array(
-    'callback' => 'drush_nagios_db_updates',
+    'callback' => 'drush_nagios_updates',
     'description' => 'Checks for pending database updates.',
     'bootstrap' => DRUSH_BOOTSTRAP_DRUPAL_SITE,
     'examples' => array(
       'command' => 'description',
-    ),
-    'options' => array(
-      'show-updates' => array(
-        'description' => 'Show pending database updates.',
-        'value' => 'optional',
-      ),
     ),
   );
   return $items;
@@ -104,16 +98,24 @@ function nagios_drush_command() {
  */
 
 /**
- * Command callback
+ * Command callback, print status message 
+ * and exit with exit status
  *
  * @return int 
  *   Exit status of the referenced functionn
  */
 function drush_nagios_updates() {
-  $update_info = _nagios_get_update_info();
-  $parsed_update_info = _nagios_parse_update_info($update_info);
+  $command = drush_get_command();
+  if ($command['command'] == 'check-db-updates') {
+    $parsed_update_info = _nagios_get_db_update_info();
+  }
+  else if ($command['command'] == 'check-updates') {
+    $update_info = _nagios_get_update_info();
+    $parsed_update_info = _nagios_parse_update_info($update_info);
+  }
   _nagios_print_message($parsed_update_info);
-  return _nagios_exit_status($parsed_update_info);    
+  drush_set_context('DRUSH_EXECUTION_COMPLETED', TRUE);
+  exit(_nagios_exit_status($parsed_update_info));
 }
 
 /** @} */ /** End of defgroup callbacks */

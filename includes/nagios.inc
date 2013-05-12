@@ -129,7 +129,7 @@ function _nagios_get_db_update_info() {
   $update_info['has_updates'] = $has_updates;
   $update_info['db_updates'] = $pending;
 
-  return $update_info
+  return $update_info;
 }
 
 
@@ -355,43 +355,51 @@ function _nagios_print_message($parsed_update_info) {
     )
   );
   
-  // Build updates message
+  // Build updates message...
+  
+  // Pending database updates message.
   if ($parsed_update_info['has_updates']) {
-   
-    unset($parsed_update_info['has_updates']);    
+    if (array_key_exists('db_updates', $parsed_update_info)) {
+      if (count($parsed_update_info['db_updates'])) {
+        $status_msg .= dt('has pending database updates, run \'drush updatedb\' or visit update.php in your browser for more details.');
+      }
+    } 
+    // Module and core updates message.
+    else {
+      unset($parsed_update_info['has_updates']);    
     
-     // Traverse serverities
-    foreach ($parsed_update_info as $serverity => $projects){
+       // Traverse serverities
+      foreach ($parsed_update_info as $serverity => $projects){
       
-      // Skip empty and uneeded serverities
-      if (count($projects) == 0 || $serverity == 'up_to_date' || $serverity == 'unknown') {
-        continue;
-      }
-      $ignored = array();
-      if ($serverity == 'ignored') {
-        foreach ($projects as $name => $project) {
-          $ignored[] = $name . '(' . $project['serverity'] . ')';
+        // Skip empty and uneeded serverities
+        if (count($projects) == 0 || $serverity == 'up_to_date' || $serverity == 'unknown') {
+          continue;
         }
-        $status_msg .= dt(' IGNORED BY SETTINGS: !modules',
-          array(
-            '!modules' => implode(',', $ignored),
-          )
-        );        
-      }
-      else {
-        $status_msg .= dt(' !type: !modules',
-          array(
-            '!type' => strtoupper(str_replace('_', ' ', $serverity)),
-            '!modules' => implode(',', array_keys($projects)),
-          )
-        );     
+        $ignored = array();
+        if ($serverity == 'ignored') {
+          foreach ($projects as $name => $project) {
+            $ignored[] = $name . '(' . $project['serverity'] . ')';
+          }
+          $status_msg .= dt(' IGNORED BY SETTINGS: !modules',
+            array(
+              '!modules' => implode(',', $ignored),
+            )
+          );        
+        }
+        else {
+          $status_msg .= dt(' !type: !modules',
+            array(
+              '!type' => strtoupper(str_replace('_', ' ', $serverity)),
+              '!modules' => implode(',', array_keys($projects)),
+            )
+          );     
+        }
       }
     }
   }
   else {
     $status_msg = $status_msg . dt('Everythings OK...');
   }
- 
   // Print message
   drush_print($status_msg);  
 }
