@@ -30,7 +30,7 @@ define('NAGIOS_CRITICAL', 2);
  */
 
 /**
- * Get list of installed projects and return thier update status information via drush functions
+ * Get list of installed projects and return their update status information via drush functions
  *
  * @return $update_info
  *   An array provided by drush´s _pm_get_update_info()
