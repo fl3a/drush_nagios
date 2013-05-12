@@ -62,6 +62,76 @@ function _nagios_get_update_info() {
   
   return $update_info;  
 }
+/**
+ * Get pending database update information
+ *
+ * @return array
+ *   An array with an update indicator 'has_updates' (boolean) 
+ *   and keyed on the corresponding modules
+ *   - pending, array of pending updates, keyed update number
+ *   - start 
+ */
+function _nagios_get_db_update_info() {
+  $has_updates = FALSE;
+  $update_info = array();
+  drush_include_engine('drupal', 'update', drush_drupal_major_version());
+  if (drush_drupal_major_version() == 7) {
+     update_main_prepare();
+     $pending = update_get_update_list();
+     if (count($pending) != 0) {
+       $has_updates = TRUE;
+     }
+  }
+  else if(drush_drupal_major_version() == 6) {
+    update_main_prepare();
+
+    $start = array();
+    $modules = drupal_get_installed_schema_version(NULL, FALSE, TRUE);
+    foreach ($modules as $module => $schema_version) {
+      $updates = drupal_get_schema_versions($module);
+      // Skip incompatible module updates completely, otherwise test schema versions.
+      if (!update_check_incompatibility($module) && $updates !== FALSE && $schema_version >= 0) {
+        // module_invoke returns NULL for nonexisting hooks, so if no updates
+        // are removed, it will == 0.
+        $last_removed = module_invoke($module, 'update_last_removed');
+        if ($schema_version < $last_removed) {
+          drush_set_error('PROVISION_DRUPAL_UPDATE_FAILED', dt( $module . ' module can not be updated. Its schema version is ' . $schema_version . '. Updates up to and including ' . $last_removed . ' have been removed in this release. In order to update ' . $module . ' module, you will first <a href="http://drupal.org/upgrade">need to upgrade</a> to the last version in which these updates were available.'));
+          continue;
+        }
+
+        $updates = drupal_map_assoc($updates);
+        foreach (array_keys($updates) as $update) {
+          if ($update > $schema_version) {
+            $start[$module] = $update;
+            break;
+          }
+        }
+
+        // Record any pending updates. Used for confirmation prompt.
+        foreach (array_keys($updates) as $update) {
+          if ($update > $schema_version) {
+            if (class_exists('ReflectionFunction')) {
+              // The description for an update comes from its Doxygen.
+              $func = new ReflectionFunction($module . '_update_' . $update);
+              $description = str_replace(array("\n", '*', '/'), '', $func->getDocComment());
+            }
+            if (empty($description)) {
+              $description = dt('description not available');
+            }
+
+            $pending[$module][] = array("$update - " . trim($description));
+            $has_updates = TRUE;
+          }
+        }
+      }
+    }
+  }
+  $update_info['has_updates'] = $has_updates;
+  $update_info['db_updates'] = $pending;
+
+  return $update_info
+}
+
 
 /**
  * Parses supplied update info and get type of update and corresponding informations
@@ -343,11 +413,12 @@ function _nagios_exit_status($parsed_update_info) {
     $security_updates = (count($parsed_update_info['security_updates']) != 0);
     $updates = (count($parsed_update_info['security_updates']) != 0);
     $not_supported = (count($parsed_update_info['not_supported']) != 0);
+    $db_updates = (count($parsed_update_info['db_updates']) != 0);
     
     if ($security_updates) {
       return NAGIOS_CRITICAL;
     }
-    elseif ($updates || $not_supported) {
+    elseif ($updates || $not_supported || $db_updates) {
       return NAGIOS_WARNING;
     }    
   }  

@@ -46,7 +46,7 @@ function nagios_drush_command() {
   $items = array();
 
   $items['check-updates'] = array(
-    'callback' => 'drush_nagios',
+    'callback' => 'drush_nagios_updates',
     'description' => 'For the usage as nagios plugin: Monitores a Drupal site and print a message and return with an exit status.',
     'bootstrap' => DRUSH_BOOTSTRAP_DRUPAL_SITE,
     'examples' => array(
@@ -80,7 +80,7 @@ function nagios_drush_command() {
     ),
   );
   $items['check-db-updates'] = array(
-    'callback' => '',
+    'callback' => 'drush_nagios_db_updates',
     'description' => 'Checks for pending database updates.',
     'bootstrap' => DRUSH_BOOTSTRAP_DRUPAL_SITE,
     'examples' => array(
@@ -105,84 +105,11 @@ function nagios_drush_command() {
 
 /**
  * Command callback
- * 
- * Print out nag
  *
  * @return int 
  *   Exit status of the referenced functionn
  */
-function drush_nagios() {
-  drush_print(drush_drupal_major_version());
-  if (drush_get_option('db-updates') ==  TRUE) {
-    drush_print('db-updates Option set');
-    drush_include_engine('drupal', 'update', drush_drupal_major_version());
-    if (drush_drupal_major_version() == 7) {
-       update_main_prepare();
-       $pending = update_get_update_list();
-       if (count($pending) != 0) {
-         drush_print('HAS DB-UPDATES');
-         die();
-       }
-       else {
-         drush_print('HAS NO DB-UPDATES');
-         die();
-       }
-    }
-    else if(drush_drupal_major_version() == 6) {
-      update_main_prepare();
-
-      $start = array();
-      $has_updates = FALSE;
-      $modules = drupal_get_installed_schema_version(NULL, FALSE, TRUE);
-      foreach ($modules as $module => $schema_version) {
-        $updates = drupal_get_schema_versions($module);
-        // Skip incompatible module updates completely, otherwise test schema versions.
-        if (!update_check_incompatibility($module) && $updates !== FALSE && $schema_version >= 0) {
-          // module_invoke returns NULL for nonexisting hooks, so if no updates
-          // are removed, it will == 0.
-          $last_removed = module_invoke($module, 'update_last_removed');
-          if ($schema_version < $last_removed) {
-            drush_set_error('PROVISION_DRUPAL_UPDATE_FAILED', dt( $module . ' module can not be updated. Its schema version is ' . $schema_version . '. Updates up to and including ' . $last_removed . ' have been removed in this release. In order to update ' . $module . ' module, you will first <a href="http://drupal.org/upgrade">need to upgrade</a> to the last version in which these updates were available.'));
-            continue;
-          }
-
-          $updates = drupal_map_assoc($updates);
-          foreach (array_keys($updates) as $update) {
-            if ($update > $schema_version) {
-              $start[$module] = $update;
-              break;
-            }
-          }
-
-          // Record any pending updates. Used for confirmation prompt.
-          foreach (array_keys($updates) as $update) {
-            if ($update > $schema_version) {
-              if (class_exists('ReflectionFunction')) {
-                // The description for an update comes from its Doxygen.
-                $func = new ReflectionFunction($module . '_update_' . $update);
-                $description = str_replace(array("\n", '*', '/'), '', $func->getDocComment());
-              }
-              if (empty($description)) {
-                $description = dt('description not available');
-              }
-
-              $pending[$module][] = array("$update - " . trim($description));
-              $has_updates = TRUE;
-            }
-          }  
-        }  
-      }
-
-      if ($has_updates) {        
-        drush_print('HAS DB-UDATES');
-        die();
-      }
-      else {
-        drush_print('HAS NO DB-UDATES');
-        die();
-      }
-    }
-  }
+function drush_nagios_updates() {
   $update_info = _nagios_get_update_info();
   $parsed_update_info = _nagios_parse_update_info($update_info);
   _nagios_print_message($parsed_update_info);
