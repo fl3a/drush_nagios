@@ -25,16 +25,23 @@ function nagios_drush_help($section) {
     case 'meta:nagios:title':
       return dt('Nagios commands');
     case 'drush:check-updates':
-      $help = dt('Checks a Drupal site for regular (core and contrib) updates.');
+      $help = dt('Checks a Drupal site for code (core and contrib) updates.');
     case 'drush:check-db-updates':
       $help = dt('Checks a Drupal site for pending database updates.');
-      return $help . dt('
+      return $help . dt
+        ('
 
 Exit status
 
 * NAGIOS_OK (0)      - if monitored Drupal site is up to date
-* NAGIOS_WARNING (1) - if there is a regular or pending database update available
-* NAGIOS_CRITICAL(2) - if there is a \'Security update\' available');
+* NAGIOS_WARNING (1) - if there is a code (core and contrib) or pending database update available
+* NAGIOS_CRITICAL(2) - if there is a code update with severity \'Security update\' available
+
+OK Message
+
+* /var/www/example.com/drupal/sites/default: Everythings OK...
+      ');
+
   }
 }
 
@@ -52,30 +59,14 @@ function nagios_drush_command() {
     'description' => 'For the usage as nagios plugin: Monitores a Drupal site and print a message and return with an exit status.',
     'bootstrap' => DRUSH_BOOTSTRAP_DRUPAL_SITE,
     'examples' => array(
-      'drush -r /path/to/drupal nagios' =>
-      "We assume that drupal-6.14 is the recommended release. (6.14 was a security update).\n" . 
-      "With an older version, eg. drupal-6.13 we get:\n" .
-      "'DRUPAL ROOT CRITICAL: drupal-6.13 @ /path/to/drupal/6.x\n" .
-      "- drupal-6.14 (Security update) from 2009-09-16 21:40 available, see http://drupal.org/node/579476 for details.'\n" .
-      "with exit status 2\n" .
-      "Or if we are running the recommended version:\n" .
-      "' DRUPAL ROOT OK: drupal-6.14 @ /path/to/drupal/6.x is up to date.'\n" .
-      "with exit status 0.",
-      'drush -r /path/to/drupal nagios --file=/path/to/file' => 'Same as above with a specified file.',
-      'drush -r /path/to/drupal -l example.com nagios' => 
-      "Assuming we have got security updates, updates and a unsupported release of a module,\n" .
-      "it will print the following output and exit with NAGIOS_CRITICAL (2) because of the security update:\n" .
-      "DRUPAL SITE CRITICAL - example.com @ /path/to/drupal/6.x/sites/example.com:\n" .
-      "SECURITY UPDATES available for image,lightbox2, Updates available for drupal,bueditor," .
-      "imce, Installed version not supported: transliterations, see http://example.com/?q=admin/reports/updates for datails.\n" .
-      "\nIf there are no updates available, this will produce to following output:\n" .
-      "DRUPAL SITE OK - example.com @ /path/to/drupal/6.x/sites/example.com: Everything is up to date."
+      'drush @example check-db-updates' => '/path/to/drupal/sites/default:  UPDATES: admin_menu,ckeditor,ckeditor_link,conditional_fields,date,devel,devel_themer,entity,features,field_collection,link,menu_attributes,menu_link,references,transliteration,views_datasource,webform SECURITY UPDATES: ctools,email',
+      'drush @example check-db-updates --ignore=ctools,email' => '/path/to/drupal/sites/default:  UPDATES: admin_menu,ckeditor,ckeditor_link,conditional_fields,date,devel,devel_themer,entity,features,field_collection,link,menu_attributes,menu_link,references,transliteration,views_datasource,webform IGNORED BY SETTINGS: ctools(SECURITY UPDATE available),email(SECURITY UPDATE available)',
      ), 
     'options' => array(
       //'changelog' => 'Show release link / link to changelog for the recommended version of a affected projects.',
       //'show-versions' => 'Show used / current and recommended versions for a affected project..',
       'ignore' => array(
-        'description' => 'Comma seperated list of projects which should be ignored, useful for patched, modified modules etc.',
+        'description' => 'Project or comma seperated list of projects which should be ignored.',
         'value' => 'required',
         'example-value' => 'project1,...,projectN',
       ),
@@ -86,7 +77,7 @@ function nagios_drush_command() {
     'description' => 'Checks for pending database updates.',
     'bootstrap' => DRUSH_BOOTSTRAP_DRUPAL_SITE,
     'examples' => array(
-      'drush @example check-db-updates' => '/var/www/example/drupal/sites/default: has pending database updates, run \'drush updatedb\' or visit update.php in your browser for more details.',
+      'drush @example check-db-updates' => '\'/path/to/drupal/sites/default: has pending database updates, run \'drush updatedb\' or visit update.php in your browser for more details.\' with exit status 1',
     ),
   );
   return $items;
