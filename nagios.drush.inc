@@ -22,17 +22,19 @@ include_once 'includes/nagios.inc';
  */
 function nagios_drush_help($section) {
   switch ($section) {
-    case 'drush:nagios':
-      return 'For the usage as nagios plugin: Monitores a Drupal site and print a message and return with an exit status.
-
-Checks a Drupal site for \'regular\' (core and contrib) and pending database updates, 
-print a status message and exit with exit status.
+    case 'meta:nagios:title':
+      return dt('Nagios commands');
+    case 'drush:check-updates':
+      $help = dt('Checks a Drupal site for regular (core and contrib) updates.');
+    case 'drush:check-db-updates':
+      $help = dt('Checks a Drupal site for pending database updates.');
+      return $help . dt('
 
 Exit status
 
 * NAGIOS_OK (0)      - if monitored Drupal site is up to date
 * NAGIOS_WARNING (1) - if there is a regular or pending database update available
-* NAGIOS_CRITICAL(2) - if there is a \'Security update\' available';      
+* NAGIOS_CRITICAL(2) - if there is a \'Security update\' available');
   }
 }
 
@@ -84,7 +86,7 @@ function nagios_drush_command() {
     'description' => 'Checks for pending database updates.',
     'bootstrap' => DRUSH_BOOTSTRAP_DRUPAL_SITE,
     'examples' => array(
-      'command' => 'description',
+      'drush @example check-db-updates' => '/var/www/example/drupal/sites/default: has pending database updates, run \'drush updatedb\' or visit update.php in your browser for more details.',
     ),
   );
   return $items;

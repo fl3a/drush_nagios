@@ -67,9 +67,89 @@ function _nagios_get_update_info() {
  *
  * @return array
  *   An array with an update indicator 'has_updates' (boolean) 
- *   and keyed on the corresponding modules
+ *   and an array 'db_updates' keyed on the corresponding modules which includes
  *   - pending, array of pending updates, keyed update number
- *   - start 
+ *   - start, update number 
+ *
+ *  Example:
+ *  <code>
+ *  Array
+ *  (
+ *     [has_updates] => 1
+ *     [db_updates] => Array
+ *         (
+ *             [system] => Array
+ *                 (
+ *                     [pending] => Array
+ *                         (
+ *                             [7073] => 7073 -   Add binary to {file_managed}, in case system_update_7034() was run without  it. 
+ *                             [7074] => 7074 -   This update has been removed and will not run. 
+ *                             [7076] => 7076 -   Convert menu_links query strings into arrays. 
+ *                             [7077] => 7077 -   Revert {file_managed}.filename changed to a binary column. 
+ *                             [7078] => 7078 -   Add binary to {date_formats}.format. 
+ *                         )
+ *
+ *                     [start] => 7073
+ *                 )
+ *
+ *             [dblog] => Array
+ *                 (
+ *                     [pending] => Array
+ *                         (
+ *                             [7002] => 7002 -   Add an index to the severity column in the watchdog database table. 
+ *                         )
+ *
+ *                     [start] => 7002
+ *                 )
+ *
+ *             [field] => Array
+ *                 (
+ *                     [pending] => Array
+ *                         (
+ *                             [7002] => 7002 -   Split the all-inclusive field_bundle_settings variable per bundle. 
+ *                             [7003] => 7003 -   Add the FieldInfo class to the class registry. 
+ *                         )
+ *
+ *                     [start] => 7002
+ *                 )
+ *             [locale] => Array
+ *                 (
+ *                     [pending] => Array
+ *                         (
+ *                             [7004] => 7004 -   Remove duplicates in {locales_source}. 
+ *                             [7005] => 7005 -   Increase {locales_languages}.formula column's length. 
+ *                         )
+ *
+ *                     [start] => 7004
+ *                 )
+ *
+ *             [node] => Array
+ *                 (
+ *                     [pending] => Array
+ *                         (
+ *                             [7013] => 7013 -   Change {node}.vid default value from 0 to NULL to avoid deadlock issues on MySQL. 
+ *                         )
+ *
+ *                     [start] => 7013
+ *                 )
+ *
+ *             [user] => Array
+ *                 (
+ *                     [pending] => Array
+ *                         (
+ *                             [7018] => 7018 -   Ensure there is an index on {users}.picture. 
+ *                         )
+ *
+ *                     [start] => 7018
+ *                 )
+ *
+ *         )
+ *
+*)
+ *</code> 
+ * @see update_main_prepare()
+ * @see update_get_update_list()
+ * @see drupal_get_schema_versions()
  */
 function _nagios_get_db_update_info() {
   $has_updates = FALSE;
