@@ -12,13 +12,22 @@
 * @{
 */
 
-/** Status 0 for nagios OK @see _NAGIOS_site() and _NAGIOS_root() */
+/**
+ * Status 0 for nagios OK 
+ * @var int NAGIOS_OK
+ */
 define('NAGIOS_OK', 0);
 
-/** Status 1 for nagios warning @see _NAGIOS_site() and _NAGIOS_root() */
+/** 
+ * Status 1 for nagios warning
+ * @var int NAGIOS_WARNING
+ */
 define('NAGIOS_WARNING', 1);
 
-/** Status 2 for nagios critical @see _NAGIOS_site() and _NAGIOS_root() */
+/** 
+ * Status 2 for nagios critical 
+ * @var int NAGIOS_CRITICAL
+ */
 define('NAGIOS_CRITICAL', 2);
 
 /** @} */ /** End of defgroup exit_status */
@@ -72,7 +81,7 @@ function _nagios_get_update_info() {
  *   - start, update number 
  *
  *  Example:
- *  <code>
+ *  @code
  *  Array
  *  (
  *     [has_updates] => 1
@@ -145,8 +154,8 @@ function _nagios_get_update_info() {
  *
  *         )
  *
-*)
- *</code> 
+ *)
+ * @endcode 
  * @see update_main_prepare()
  * @see update_get_update_list()
  * @see drupal_get_schema_versions()
@@ -329,8 +338,8 @@ function _nagios_get_db_update_info() {
  * 
  *        )
  *
- *)
- *@endcode 
+ * )
+ * @endcode 
  */
 function _nagios_parse_update_info($update_info) {
 
@@ -515,13 +524,4 @@ function _nagios_exit_status($parsed_update_info) {
   }
 } 
 
-/** @} */ /** End of defgroup nagios */
- 
-/**
- * @defgroup filesystem Filesystem functions
- * Functions that do search and scan operation on the local file system.
- * @{  
- */
-
-/** @} */ /** End of defgroup helper */
-
+/** @} */

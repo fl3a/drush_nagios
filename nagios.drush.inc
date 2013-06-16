@@ -82,7 +82,7 @@ function nagios_drush_command() {
   );
   return $items;
 }
-/** @} */ /** End of defgroup drush_hooks */
+/** @} */ 
 
 /**
  * @defgroup drush_callbacks Drush callbacks
@@ -110,6 +110,4 @@ function drush_nagios_updates() {
   drush_set_context('DRUSH_EXECUTION_COMPLETED', TRUE);
   exit(_nagios_exit_status($parsed_update_info));
 }
-
-/** @} */ /** End of defgroup callbacks */
-
+/** @} */ 
