@@ -70,6 +70,20 @@ function nagios_drush_command() {
         'value' => 'required',
         'example-value' => 'project1,...,projectN',
       ),
+      /** @todo Implement recommended-version option  in @ref _nagios_print_message().*/
+      /*  
+      'recommended-version' => array(
+        'value' => 'optional',  
+        'description' => 'Show recomended version for affected projects .',
+      ),
+      */
+      /** @todo Implement changelog option in @ref _nagios_print_message(). */
+      /*
+      'changelog' => array(
+        'value' => 'optional',
+        'description' => 'Show uri of changelog for affected projects.',
+      ),
+      */
     ),
   );
   $items['check-db-updates'] = array(

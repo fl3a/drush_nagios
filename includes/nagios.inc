@@ -30,7 +30,7 @@ define('NAGIOS_WARNING', 1);
  */
 define('NAGIOS_CRITICAL', 2);
 
-/** @} */ /** End of defgroup exit_status */
+/** @} */
  
 /**
  * @defgroup helper_functions Helper functions
@@ -421,14 +421,6 @@ function _nagios_parse_update_info($update_info) {
   }
   return $updates;
 }
-
-/** @}*/
-
-/** Nagios functions
- * Functions that deals with Nagios
- * @see @ref nagios_help
- * @{  
- */
 
 /**
  * Monitores a single Drupal site for module and core updates  
