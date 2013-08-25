@@ -42,6 +42,8 @@ Just install it via drush, type:
 Every command got a help.
 Type `drush help COMMAND` for options and further informations.
 
+See also [example.aliases.drushrc.php][5].
+
 ## Credits
 
 Thanks to the mighty hundfred, friend and Bastard Operator from Hell,
@@ -53,4 +55,5 @@ This module was sponsored and written by [ISL Florian Latzel][5].
 [2]:http://en.wikipedia.org/wiki/Nagios
 [3]:http://en.wikipedia.org/wiki/Icinga
 [4]:http://en.wikipedia.org/wiki/Nagios#NRPE
-[5]:http://is-loesungen.de
+[5]:https://github.com/fl3a/drush_nagios/blob/master/example/example.aliases.drushrc.php
+[6]:http://is-loesungen.de
