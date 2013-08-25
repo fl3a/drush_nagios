@@ -2,7 +2,7 @@
 
 ## Introduction
 
-Trying to isolate Nagios/Icinga functionality from [drush_multi][1]
+Isolated Nagios/Icinga functionality from [drush_multi][1]
 
 For the usage as [Nagios][2]/[Icinga][3] [NRPE Plugin][4].
 
