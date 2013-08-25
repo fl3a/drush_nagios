@@ -29,7 +29,7 @@
  * Site alias 'dev' with command specific options for nagios
  * 
  * - ignore
- * @code $aliases['dev']['command-specific']['nagios']['ignore'] = 'project1,project2,projectN';@endcode
+ * @code $aliases['dev']['command-specific']['check-updates']['ignore'] = 'project1,project2,projectN';@endcode
  *  - Comma seperated list of projects which should be ignored, useful for patched, modified modules etc.
  */
 $aliases['dev'] = array(
@@ -37,7 +37,7 @@ $aliases['dev'] = array(
   'root' => '/path/to/drupal/root',
 
   'command-specific' => array (
-    'nagios' => array(
+    'check-updates' => array(
       'ignore' => 'project1,project2,projectN',
     ),
   ),
