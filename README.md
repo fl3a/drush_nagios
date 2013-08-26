@@ -14,7 +14,7 @@ drush_nagios includes the following command:
 
 ## check-updates
 
-Checks for pending updates.
+Checks for pending updates including Drupal (core), modules and themes.
 
 ## check-db-updates
 
@@ -50,8 +50,9 @@ Type `drush help COMMAND` for options and further informations.
 Thanks to the mighty hundfred, friend and Bastard Operator from Hell,
 who inspired me to write this (Nagios) Drush plugin.
 
-This module was sponsored and written by [ISL Florian Latzel][8]],
-proud member of [Reinblau, Drupal Agency Berlin, Cologne, Munich][9].
+This module was sponsored and written by [fl3a][8], [Florian Latzel][9],   
+[Drupal-CMS-\[Consulting  Architecture Development\] and Open Source support in Cologne][9]   
+proud member of [Reinblau, Drupal Agency in Berlin, Cologne and Munich][10].   
 
 [1]:http://drupal.org/project/drush_multi
 [2]:http://en.wikipedia.org/wiki/Nagios
@@ -60,5 +61,6 @@ proud member of [Reinblau, Drupal Agency Berlin, Cologne, Munich][9].
 [5]:http://drush.ws
 [6]:https://github.com/fl3a/drush_nagios/blob/master/example/example.aliases.drushrc.php
 [7]:http://is-loesungen.de/docu/drush_nagios/index.html
-[8]:http://is-loesungen.de
-[9]:http://reinblau.de
+[8]:https://drupal.org/user/51103
+[9]:http://is-loesungen.de
+[10]:http://reinblau.de
