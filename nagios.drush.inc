@@ -26,23 +26,23 @@ function nagios_drush_help($section) {
       return dt('Nagios commands');
     case 'drush:check-updates':
       $help = dt('Checks a Drupal site for code (core and contrib) updates.');
+      break;
     case 'drush:check-db-updates':
       $help = dt('Checks a Drupal site for pending database updates.');
-      return $help . dt
-        ('
+      break;
+  }
+  return $help . dt('
 
 Exit status
 
 * NAGIOS_OK (0)      - if monitored Drupal site is up to date
-* NAGIOS_WARNING (1) - if there is a code (core and contrib) or pending database update available
+* NAGIOS_WARNING (1) - if there is a code (core, contrib and theme) or pending database update available
 * NAGIOS_CRITICAL(2) - if there is a code update with severity \'Security update\' available
 
 OK Message
 
 * /var/www/example.com/drupal/sites/default: Everythings OK...
-      ');
-
-  }
+  ');
 }
 
 /**
@@ -59,8 +59,8 @@ function nagios_drush_command() {
     'description' => 'For the usage as nagios plugin: Monitores a Drupal site and print a message and return with an exit status.',
     'bootstrap' => DRUSH_BOOTSTRAP_DRUPAL_SITE,
     'examples' => array(
-      'drush @example check-db-updates' => '/path/to/drupal/sites/default:  UPDATES: admin_menu,ckeditor,ckeditor_link,conditional_fields,date,devel,devel_themer,entity,features,field_collection,link,menu_attributes,menu_link,references,transliteration,views_datasource,webform SECURITY UPDATES: ctools,email',
-      'drush @example check-db-updates --ignore=ctools,email' => '/path/to/drupal/sites/default:  UPDATES: admin_menu,ckeditor,ckeditor_link,conditional_fields,date,devel,devel_themer,entity,features,field_collection,link,menu_attributes,menu_link,references,transliteration,views_datasource,webform IGNORED BY SETTINGS: ctools(SECURITY UPDATE available),email(SECURITY UPDATE available)',
+      'drush @example check-updates' => '/path/to/drupal/sites/default:  UPDATES: admin_menu,ckeditor,ckeditor_link,conditional_fields,date,devel,devel_themer,entity,features,field_collection,link,menu_attributes,menu_link,references,transliteration,views_datasource,webform SECURITY UPDATES: ctools,email',
+      'drush @example check-updates --ignore=ctools,email' => '/path/to/drupal/sites/default:  UPDATES: admin_menu,ckeditor,ckeditor_link,conditional_fields,date,devel,devel_themer,entity,features,field_collection,link,menu_attributes,menu_link,references,transliteration,views_datasource,webform IGNORED BY SETTINGS: ctools(SECURITY UPDATE available),email(SECURITY UPDATE available)',
      ), 
     'options' => array(
       //'changelog' => 'Show release link / link to changelog for the recommended version of a affected projects.',
