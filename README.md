@@ -51,7 +51,7 @@ Thanks to the mighty hundfred, friend and Bastard Operator from Hell,
 who inspired me to write this (Nagios) Drush plugin.
 
 This module was sponsored and written by [fl3a][8], [Florian Latzel][9],   
-[Drupal-CMS-\[Consulting  Architecture Development\] and Open Source support in Cologne][9]   
+[Drupal-CMS-\[Consulting  Architecture Development\] and Open Source support in Cologne][9],      
 proud member of [Reinblau, Drupal Agency in Berlin, Cologne and Munich][10].   
 
 [1]:http://drupal.org/project/drush_multi
