@@ -70,6 +70,9 @@ function nagios_drush_command() {
         'value' => 'required',
         'example-value' => 'project1,...,projectN',
       ),
+      'ignore-locked' => array(
+        'description' => 'Ignore projects which are locked by drush pm-update --lock.',
+      ),
       /** @todo Implement recommended-version option  in @ref _nagios_print_message().*/
       /*  
       'recommended-version' => array(
