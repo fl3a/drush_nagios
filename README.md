@@ -4,7 +4,7 @@
 
 Isolated Nagios/Icinga functionality from [drush_multi][1]
 
-For the usage as [Nagios][2]/[Icinga][3] [NRPE Plugin][4].
+For the usage as [Nagios][2]/[Icinga][3] [NRPE Plugin][4] via [Drush][5].
 
 It just prints a message and exit with an exit status.
 
@@ -35,25 +35,30 @@ Download and extract this extension to a number of places:
 
 Just install it via drush, type:
 	
-	drush dl drush_nagios
+    drush dl drush_nagios
 
 ## Documentation
 
 Every command got a help.
 Type `drush help COMMAND` for options and further informations.
 
-See also [example.aliases.drushrc.php][5].
+- @see [example.aliases.drushrc.php][6] for Drush alias configuration
+- @see [Drush Nagios (drush_nagios) Doxygen Dokumentation][7]
 
 ## Credits
 
 Thanks to the mighty hundfred, friend and Bastard Operator from Hell,
 who inspired me to write this (Nagios) Drush plugin.
 
-This module was sponsored and written by [ISL Florian Latzel][5].
+This module was sponsored and written by [ISL Florian Latzel][8]],
+proud member of [Reinblau, Drupal Agency Berlin, Cologne, Munich][9].
 
 [1]:http://drupal.org/project/drush_multi
 [2]:http://en.wikipedia.org/wiki/Nagios
 [3]:http://en.wikipedia.org/wiki/Icinga
 [4]:http://en.wikipedia.org/wiki/Nagios#NRPE
-[5]:https://github.com/fl3a/drush_nagios/blob/master/example/example.aliases.drushrc.php
-[6]:http://is-loesungen.de
+[5]:http://drush.ws
+[6]:https://github.com/fl3a/drush_nagios/blob/master/example/example.aliases.drushrc.php
+[7]:http://is-loesungen.de/docu/drush_nagios/index.html
+[8]:http://is-loesungen.de
+[9]:http://reinblau.de
