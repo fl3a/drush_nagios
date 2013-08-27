@@ -31,6 +31,9 @@
  * - ignore
  * @code $aliases['dev']['command-specific']['check-updates']['ignore'] = 'project1,project2,projectN';@endcode
  *  - Comma seperated list of projects which should be ignored, useful for patched, modified modules etc.
+ * - ignore-locked
+ * @code $aliases['dev']['command-specific']['check-updates']['ingnore-locked'] = 1';@endcode
+ *  - Ignore projects which are locked by `drush pm-update --lock`.
  */
 $aliases['dev'] = array(
   'uri' => 'dev.mydrupalsite.com',
@@ -39,6 +42,7 @@ $aliases['dev'] = array(
   'command-specific' => array (
     'check-updates' => array(
       'ignore' => 'project1,project2,projectN',
+      'ignore-locked' => 1,
     ),
   ),
 );
