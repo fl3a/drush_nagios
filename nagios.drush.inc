@@ -21,18 +21,7 @@ include_once 'includes/nagios.inc';
  *   A string with the help text for your command.
  */
 function nagios_drush_help($section) {
-  switch ($section) {
-    case 'meta:nagios:title':
-      return dt('Nagios commands');
-    case 'drush:check-updates':
-      $help = dt('Checks a Drupal site for code (core and contrib) updates.');
-      break;
-    case 'drush:check-db-updates':
-      $help = dt('Checks a Drupal site for pending database updates.');
-      break;
-  }
-  return $help . dt('
-
+  $help_header = dt('
 Exit status
 
 * NAGIOS_OK (0)      - if monitored Drupal site is up to date
@@ -42,7 +31,19 @@ Exit status
 OK Message
 
 * /var/www/example.com/drupal/sites/default: Everythings OK...
-  ');
+');
+  switch ($section) {
+    case 'meta:nagios:title':
+      return dt('Nagios commands');
+    case 'drush:check-updates':
+      $help = dt('Checks a Drupal site for code (core and contrib) updates.');
+      return $help . $help_header;
+      break;
+    case 'drush:check-db-updates':
+      $help = dt('Checks a Drupal site for pending database updates.');
+      return $help . $help_header;
+      break;
+  }
 }
 
 /**
