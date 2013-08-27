@@ -1,4 +1,5 @@
 <?php  
+
 /**
  * @file
  * Helper functions for nagios commands
@@ -69,9 +70,6 @@ function _nagios_get_update_info() {
   drush_set_option('quiet', 0, 'all');
   drush_set_context('DRUSH_QUIET', 0);
 
-
-  @$lock = drush_pm_update_lock($update_info, array(), array(), array());
-  //drush_print_r($lock);
   return $update_info;  
 }
 /**
