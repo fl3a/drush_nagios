@@ -346,7 +346,7 @@ function _nagios_parse_update_info($update_info) {
 
   $updates = array();
   
-  // Update indicator 
+  // Update indicator.
   $updates['has_updates'] = FALSE;
   
   // Serverities  
@@ -364,15 +364,15 @@ function _nagios_parse_update_info($update_info) {
   
   foreach($update_info as $project) {
 
-    // Severity / Type of update
+    // Severity / Type of update.
     ob_start();    
     $update_type = pm_update_filter($project);
     ob_end_clean();
 
-    // maschine readable name of the project
+    // maschine readable name of the project.
     $project_name = $project['name'];
 
-    // Create array to append it later
+    // Create array to append it later.
     $update = array();
     $update['project_type'] =  $project['project_type'];
     $update['existing_version'] =  $project['existing_version'];
@@ -384,7 +384,7 @@ function _nagios_parse_update_info($update_info) {
       $update['serverity'] =  dt($update_type);
     }
 
-    // Add locked projects to ingnore array.
+    // Add projects which are locked through `drush pm-update --lock` to ingnore array.
     if (drush_get_option('ignore-locked')) {
       if (isset($project['path'])) {
         $lockfile = $drupal_root . '/' . $project['path'] . '/.drush-lock-update';
@@ -394,13 +394,13 @@ function _nagios_parse_update_info($update_info) {
       }
     }
 
-    // Add project to $updates['ignored'] and skip this loop iteration
+    // Add projects from ignore array to $updates['ignored'] and skip this loop iteration.
     if (in_array($project_name, $ignore)) {
       $updates['ignored'][$project_name] = $update;
       continue;
     }
 
-    // Get type of update and append it to the array
+    // Get severity of update and append it to the array.
     switch ($update_type) {
       case dt('Update available') :
         $updates['updates'][$project_name] = $update;
@@ -426,8 +426,7 @@ function _nagios_parse_update_info($update_info) {
         break; 
       default:
         $updates['unknown'][$project_name] = $update;
-        break;
-              
+        break;              
     }        
   }
   return $updates;
