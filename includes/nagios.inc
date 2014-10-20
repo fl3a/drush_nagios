@@ -32,6 +32,17 @@ define('NAGIOS_WARNING', 1);
 define('NAGIOS_CRITICAL', 2);
 
 /** @} */
+
+/**
+ * Drush version switch for including needed pm_release_recommended() 
+ * in drush above v.5 which lives there in a different place.
+ * 
+ * @see https://www.drupal.org/node/2358075 
+ */
+if ((int)DRUSH_VERSION > 5) {
+  $doc_prefix = drush_get_context('DOC_PREFIX');
+  include_once $doc_prefix . '/commands/pm/updatestatus.pm.inc';
+}
  
 /**
  * @defgroup helper_functions Helper functions
