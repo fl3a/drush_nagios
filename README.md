@@ -62,8 +62,10 @@ Type `drush help COMMAND` for options and further informations.
 Thanks to the mighty hundfred, friend and Bastard Operator from Hell,
 who inspired me to write this (Nagios) Drush plugin.
 
-This module was and written by [fl3a][9], [Florian Latzel][10],   
+This module was and written by [fl3a][9], [Florian Latzel][10], 
+  
 [Drupal-CMS-[Consulting  Architecture Development] and Open Source support in Cologne][9],      
+
 proud member of [Reinblau, Drupal Agency in Berlin, Cologne and Munich][11].   
 
 [1]:http://drupal.org/project/drush_multi
