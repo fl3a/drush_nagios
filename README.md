@@ -2,11 +2,8 @@
 
 ## Introduction
 
-Isolated Nagios/Icinga functionality from [drush_multi][1]
-
-For the usage as [Nagios][2]/[Icinga][3] [NRPE Plugin][4] via [Drush][5].
-
-It just prints a message and exit with an exit status.
+Isolated Nagios/Icinga functionality from [drush_multi][1],
+for the usage as [Nagios][2]/i[Icinga][3] [NRPE Plugin][4] via [Drush][5], it just prints a message and exit with an exit status.
 
 You can find the original [project page][6] at http://drupal.org/project/drush_nagios .
 
@@ -16,11 +13,26 @@ drush_nagios includes the following command:
 
 ## check-updates
 
-Checks for pending updates including Drupal (core), modules and themes.
+Checks for pending updates including Drupal (core), modules and themes grouped by type/serverity of update followed by the corresonding modules.
+
+This command has an option to ignore projects.
 
 ## check-db-updates
 
 Checks for pending database updates.
+
+You may ignore 
+
+## check-drupal
+
+Check the Drupal Status report (requirements) items and their serverity, such as:
+- module updates
+- last run of cron
+- database schema
+- files directory writability
+- access to update.php
+- files directory protection via .htaccess
+- contribs that implements hook_requirements()
 
 ## Installation
 
@@ -62,7 +74,7 @@ proud member of [Reinblau, Drupal Agency in Berlin, Cologne and Munich][11].
 [4]:http://en.wikipedia.org/wiki/Nagios#NRPE
 [5]:http://drush.ws
 [6]:http://drupal.org/project/drush_nagios
-[7]:https://github.com/fl3a/drush_nagios/blob/master/example/example.aliases.drushrc.php
+[7]:http://cgit.drupalcode.org/drush_nagios/tree/example/example.aliases.drushrc.php
 [8]:http://is-loesungen.de/docu/drush_nagios/index.html
 [9]:https://drupal.org/user/51103
 [10]:http://is-loesungen.de
