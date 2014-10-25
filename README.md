@@ -21,11 +21,9 @@ This command has an option to ignore projects.
 
 Checks for pending database updates.
 
-You may ignore 
-
 ## check-drupal
 
-Check the Drupal Status report (requirements) items and their serverity, such as:
+Check the Drupal Status report for status and met requirement items and their serverity, such as:
 - module updates
 - last run of cron
 - database schema
