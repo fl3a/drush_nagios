@@ -443,6 +443,210 @@ function _nagios_parse_update_info($update_info) {
   return $updates;
 }
 
+
+/**
+ * Get Drupals status and requirement informations. 
+ *
+ * @return array
+ *   An array key on requirement, which contains at least:
+ *   - title, Readable status/requirement
+ *   - value, its value
+ *   Optional:
+ *   - severity, Status code
+ *   - description, more details
+ *   - weight
+ * @code 
+ * Array
+ * (
+ *     [drupal] => Array
+ *         (
+ *             [title] => Drupal
+ *             [value] => 6.33
+ *             [severity] => -1
+ *             [weight] => -10
+ *         )
+ * 
+ *     [webserver] => Array
+ *         (
+ *             [title] => Web server
+ *             [value] => Apache/2.4.10 (Debian)
+ *         )
+ * 
+ *     [php] => Array
+ *         (
+ *             [title] => PHP
+ *             [value] => <a href="/admin/reports/status/php">5.6.0-1</a>
+ *         )
+ * 
+ *     [php_register_globals] => Array
+ *         (
+ *             [title] => PHP register globals
+ *             [value] => Disabled
+ *         )
+ * 
+ *     [php_memory_limit] => Array
+ *         (
+ *             [title] => PHP memory limit
+ *             [value] => 128M
+ *         )
+ * 
+ *     [mysql] => Array
+ *         (
+ *             [title] => MySQL database
+ *             [value] => <a href="/admin/reports/status/sql">5.5.39</a>
+ *         )
+ * 
+ *     [settings.php] => Array
+ *         (
+ *             [value] => Not protected
+ *             [severity] => 2
+ *             [description] => The file <em>sites/netzaffe.de/settings.php</em> is not protected from modifications and poses a security risk. You must change the file's permissions to be non-writable.
+ *             [title] => Configuration file
+ *         )
+ * 
+ *     [files_htaccess] => Array
+ *         (
+ *             [title] => Files directory
+ *             [value] => Not fully protected
+ *             [severity] => 2
+ *             [description] => See <a href="http://drupal.org/SA-CORE-2013-003">http://drupal.org/SA-CORE-2013-003</a> for information about the recommended .htaccess file which should be added to the <em>sites/netzaffe.de/files</em> directory to help protect against arbitrary code execution.
+ *         )
+ * 
+ *     [cron] => Array
+ *         (
+ *             [title] => Cron maintenance tasks
+ *             [severity] => 0
+ *             [value] => Last run 1 hour 18 min ago
+ *             [description] =>  You can <a href="/admin/reports/status/run-cron">run cron manually</a>.
+ *         )
+ * 
+ *     [file system] => Array
+ *         (
+ *             [title] => File system
+ *             [value] => Writable (<em>public</em> download method)
+ *         )
+ * 
+ *     [update] => Array
+ *         (
+ *             [title] => Database updates
+ *             [severity] => 0
+ *             [value] => Up to date
+ *         )
+ * 
+ *     [update access] => Array
+ *         (
+ *             [value] => Protected
+ *             [title] => Access to update.php
+ *         )
+ * 
+ *     [unicode] => Array
+ *         (
+ *             [title] => Unicode library
+ *             [value] => PHP Mbstring Extension
+ *             [severity] => 0
+ *         )
+ * 
+ *     [update status] => Array
+ *         (
+ *             [value] => Enabled
+ *             [title] => Update notifications
+ *         )
+ * 
+ *     [http requests] => Array
+ *         (
+ *             [title] => HTTP request status
+ *             [value] => Fails
+ *             [severity] => 2
+ *             [description] => Your system or network configuration does not allow Drupal to access web pages, resulting in reduced functionality. This could be due to your webserver configuration or PHP settings, and should be resolved in order to download information about available updates, fetch aggregator feeds, sign in via OpenID, or use other network-dependent services.
+ *         )
+ * 
+ *     [update_core] => Array
+ *         (
+ *             [title] => Drupal core update status
+ *             [value] => No update data available
+ *             [severity] => 1
+ *             [reason] => -2
+ *             [description] => No information is available about potential new releases for currently installed modules and themes. To check for updates, you may need to <a href="/admin/reports/status/run-cron?destination=admin%2Fsettings%2Flanguage">run cron</a> or you can <a href="/admin/reports/updates/check?destination=admin%2Fsettings%2Flanguage">check manually</a>. Please note that checking for available updates can take a long time, so please be patient.
+ *         )
+ * 
+ *     [captcha_wrong_response_counter] => Array
+ *         (
+ *             [title] => CAPTCHA
+ *             [value] => Already 61082 blocked form submissions
+ *             [severity] => -1
+ *         )
+ * 
+ *     [0] => Array
+ *         (
+ *             [title] => GeSHi filter
+ *             [value] => Found GeSHi library version <em>1.0.8</em>
+ *             [severity] => 0
+ *         )
+ * 
+ *     [image_import_dir] => Array
+ *         (
+ *             [title] => Image import
+ *             [value] => Import directory <em>sites/netzaffe.de/files/images/import</em> does not exist or is not writable.
+ *             [description] => The import directory <em>sites/netzaffe.de/files/images/import</em> either does not exist or does not grant the web container write permission. Either <a href="/admin/settings/image/image_import">choose</a> a different directory or create the <em>sites/netzaffe.de/files/images/import</em> directory and grant write permissions. The Image import module will not function until this is corrected.
+ *             [severity] => 2
+ *         )
+ * 
+ *     [image_toolkit] => Array
+ *         (
+ *             [value] => The <em>gd</em> toolkit is installed.
+ *             [severity] => 0
+ *             [title] => Image toolkit
+ *         )
+ * 
+ *     [image_dirs] => Array
+ *         (
+ *             [value] => Exists (<em>sites/netzaffe.de/files/images</em>).
+ *             [severity] => 0
+ *             [title] => Image module directories
+ *         )
+ * 
+ *     [page_title_version] => Array
+ *         (
+ *             [title] => Page title version
+ *             [value] => Enabled (<code>page_title</code> table contains 0 rows)
+ *             [severity] => 0
+ *         )
+ * 
+ *     [tagadelic] => Array
+ *         (
+ *             [severity] => 0
+ *             [title] => Tagadelic
+ *             [value] => No incompatible modules enabled.
+ *         )
+ * 
+ *     [xmlsitemap_directory] => Array
+ *         (
+ *             [title] => XML sitemap cache directory
+ *             [value] => Writable
+ *         )
+ * 
+ *     [xmlsitemap_generated] => Array
+ *         (
+ *             [title] => XML sitemap
+ *             [value] => Last attempted generation on 2014-10-25 14:34 (1 hour 18 min ago).
+ *             [severity] => 0
+ *         )
+ * 
+ * )
+ * @endcode
+ * 
+ * @see <a href="https://api.drupal.org/api/drupal/modules%21system%21system.admin.inc/function/system_status/7">system_status()</a>
+ */ 
+function _nagios_get_drupal_status_info() {
+  include_once './includes/install.inc';
+  drupal_load_updates();
+
+  // Check run-time requirements and status information.
+  $requirements = module_invoke_all('requirements', 'runtime');
+
+  return $requirements;
+}
+
 /**
  * Monitores a single Drupal site for module and core updates  
  *
