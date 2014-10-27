@@ -498,9 +498,7 @@ function _nagios_parse_update_info($update_info) {
  * 
  *     [settings.php] => Array
  *         (
- *             [value] => Not protected
- *             [severity] => 2
- *             [description] => The file <em>sites/netzaffe.de/settings.php</em> is not protected from modifications and poses a security risk. You must change the file's permissions to be non-writable.
+ *             [value] => Protected
  *             [title] => Configuration file
  *         )
  * 
@@ -648,6 +646,71 @@ function _nagios_get_drupal_status_info() {
 }
 
 /**
+ * Parses the requirements by _nagios_get_drupal_status_info() 
+ *
+ * @return array
+ *   An array key
+ * @code
+ * Array
+ * (
+ *     [requirement_violation] => 1
+ *     [requirement_warning] => Array
+ *         (
+ *             [files_htaccess] => Array
+ *                 (
+ *                     [title] => Files directory
+ *                     [value] => Not fully protected
+ *                 )
+ * 
+ *             [http requests] => Array
+ *                 (
+ *                     [title] => HTTP request status
+ *                     [value] => Fails
+ *                 )
+ * 
+ *             [image_import_dir] => Array
+ *                 (
+ *                     [title] => Image import
+ *                     [value] => Import directory <em>sites/netzaffe.de/files/images/import</em> does not exist or is not writable.
+ *                 )
+ * 
+ *         )
+ * 
+ * )
+ * @endcode
+ * 
+ * @see <a href="https://api.drupal.org/api/drupal/includes%21install.inc/7">install.inc</a>
+ */
+function _nagios_parse_drupal_status_info($requirements) {
+  $parsed_requirements = array(
+   // Indicator variable.
+   'requirement_violation' => FALSE,  
+  );
+  foreach ($requirements as $key => $requirement) {
+    //drush_print_r($requirement); drush_print_r($key);
+    if (array_key_exists('severity', $requirement) && !array_key_exists('reason', $requirement)) {
+      if ($requirement['severity'] != 0 || $requirement['severity'] != -1) {
+        if ($requirement['severity'] == 1) {
+          $parsed_requirements['requirement_violation'] = TRUE;
+          $parsed_requirements['requirement_warning'][$key] = array(
+            'title' => $requirement['title'], 
+            'value' => $requirement['value']
+          );
+        }
+        if ($requirement['severity'] == 2) {
+          $parsed_requirements['requirement_violation'] = TRUE;
+          $parsed_requirements['requirement_warning'][$key] = array(
+            'title' => $requirement['title'], 
+            'value' => $requirement['value']
+          );
+        }
+      }       
+    }
+  }
+  return $parsed_requirements;
+}
+
+/**
  * Monitores a single Drupal site for module and core updates  
  *
  * Print a message for nagios 
@@ -709,7 +772,6 @@ function _nagios_print_message($parsed_update_info) {
   // Print message
   drush_print($status_msg);  
 }
-
 
 /**
  * Return exit status for nagios
