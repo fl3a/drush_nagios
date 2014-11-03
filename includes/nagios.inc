@@ -649,34 +649,55 @@ function _nagios_get_drupal_status_info() {
  * Parses the requirements by _nagios_get_drupal_status_info() 
  *
  * @return array
- *   An array key
+ *   An associative array with requirement_violation as indicator and items grouped by severities(requirement_warning, requirement_error) and ignored.
  * @code
  * Array
  * (
  *     [requirement_violation] => 1
  *     [requirement_warning] => Array
  *         (
+ *             [cron] => Array
+ *                 (
+ *                     [title] => Cron maintenance tasks
+ *                     [value] => Last run 1 week 2 days ago
+ *                     [severity] => 1
+ *                 )
+ * 
+ *             [xmlsitemap_generated] => Array
+ *                 (
+ *                     [title] => XML sitemap
+ *                     [value] => Last attempted generation on 2014-10-25 14:34 (1 week 2 days ago).
+ *                     [severity] => 1
+ *                 )
+ *         )
+ *     [requirement_error] => Array
+ *         (
  *             [files_htaccess] => Array
  *                 (
  *                     [title] => Files directory
  *                     [value] => Not fully protected
+ *                     [severity] => 2
  *                 )
+ * 
  * 
  *             [http requests] => Array
  *                 (
  *                     [title] => HTTP request status
  *                     [value] => Fails
+ *                     [severity] => 2
  *                 )
- * 
- *             [image_import_dir] => Array
- *                 (
- *                     [title] => Image import
- *                     [value] => Import directory <em>sites/netzaffe.de/files/images/import</em> does not exist or is not writable.
- *                 )
- * 
  *         )
  * 
- * )
+ *     [ignored] => Array
+ *         (
+ *             [unicode] => Array
+ *                 (
+ *                     [title] => Unicode library
+ *                     [value] => Error
+ *                     [severity] => 2
+ *                 )
+ *         )
+ * ) 
  * @endcode
  * 
  * @see <a href="https://api.drupal.org/api/drupal/includes%21install.inc/7">install.inc</a>
@@ -685,24 +706,27 @@ function _nagios_parse_drupal_status_info($requirements) {
   $parsed_requirements = array(
    // Indicator variable.
    'requirement_violation' => FALSE,  
+   'requirement_warning' => array(),
+   'requirement_error' => array(),
+   'ignored' => array(),
   );
+  $ignore = array();
+  $ignore = explode(',', drush_get_option('ignore'));
   foreach ($requirements as $key => $requirement) {
     //drush_print_r($requirement); drush_print_r($key);
     if (array_key_exists('severity', $requirement) && !array_key_exists('reason', $requirement)) {
+      if (in_array($key, $ignore)) {
+        $parsed_requirements['ignored'][$key] =  $requirement;
+        continue;
+      }
       if ($requirement['severity'] != 0 || $requirement['severity'] != -1) {
         if ($requirement['severity'] == 1) {
           $parsed_requirements['requirement_violation'] = TRUE;
-          $parsed_requirements['requirement_warning'][$key] = array(
-            'title' => $requirement['title'], 
-            'value' => $requirement['value']
-          );
+          $parsed_requirements['requirement_warning'][$key] = $requirement; 
         }
         if ($requirement['severity'] == 2) {
           $parsed_requirements['requirement_violation'] = TRUE;
-          $parsed_requirements['requirement_warning'][$key] = array(
-            'title' => $requirement['title'], 
-            'value' => $requirement['value']
-          );
+          $parsed_requirements['requirement_error'][$key] = $requirement; 
         }
       }       
     }
