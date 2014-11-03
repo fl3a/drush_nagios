@@ -69,7 +69,7 @@ function nagios_drush_command() {
       'ignore' => array(
         'description' => 'Project or comma seperated list of projects which should be ignored.',
         'value' => 'required',
-        'example-value' => 'project1,...,projectN',
+        'example-value' => 'ctools,email',
       ),
       'ignore-locked' => array(
         'description' => 'Ignore projects which are locked by drush pm-update --lock.',
@@ -98,6 +98,21 @@ function nagios_drush_command() {
       'drush @example check-db-updates' => '\'/path/to/drupal/sites/default: has pending database updates, run \'drush updatedb\' or visit update.php in your browser for more details.\' with exit status 1',
     ),
   );
+  $items['check-drupal-requirements'] = array(
+    'callback' => 'drush_drupal_requirements',
+    'description' => 'Checks for anything under Drupals status report.',
+    'bootstrap' => DRUSH_BOOTSTRAP_DRUPAL_FULL,
+    'options' => array(
+       'ignore' => array(
+        'description' => 'Requirement or comma seperated list of requirements which should be ignored.',
+        'value' => 'required',
+        'example-value' => 'unicode',
+      ),
+    ),   
+    //'examples' => array(
+    //  'drush @example check-db-updates' => '\'/path/to/drupal/sites/default: has pending database updates, run \'drush updatedb\' or visit update.php in your browser for more details.\' with exit status 1',
+    //),
+  );
   return $items;
 }
 /** @} */ 
@@ -118,14 +133,34 @@ function nagios_drush_command() {
 function drush_nagios_updates() {
   $command = drush_get_command();
   if ($command['command'] == 'check-db-updates') {
-    $parsed_update_info = _nagios_get_db_update_info();
+    $parsed_info = _nagios_get_db_update_info();
   }
   else if ($command['command'] == 'check-updates') {
-    $update_info = _nagios_get_update_info();
-    $parsed_update_info = _nagios_parse_update_info($update_info);
+    $info = _nagios_get_update_info();
+    $parsed_info = _nagios_parse_update_info($info);
   }
-  _nagios_print_message($parsed_update_info);
+  else if ($command['command'] == 'check-updates') {
+    $info = _nagios_get_drupal_status_info();
+    $parsed_info = _nagios_parse_drupal_status_info($info);
+    drush_print_r($requirements);
+  }
+  _nagios_print_message($parsed_info);
   drush_set_context('DRUSH_EXECUTION_COMPLETED', TRUE);
-  exit(_nagios_exit_status($parsed_update_info));
+  exit(_nagios_exit_status($parsed_info));
+}
+
+/**
+ * Command callback, print status message
+ * and exit with exit status
+ *
+ * @return int 
+ *   Exit status of the referenced functionn
+ */
+function drush_drupal_requirements() {
+    $info = _nagios_get_drupal_status_info();
+    $parsed_info = _nagios_parse_drupal_status_info($info);
+    drush_print_r($parsed_info);
+    drush_set_context('DRUSH_EXECUTION_COMPLETED', TRUE);
+  //exit(_nagios_exit_status($parsed_update_info));
 }
 /** @} */ 
