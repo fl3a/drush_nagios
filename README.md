@@ -23,7 +23,8 @@ Checks for pending database updates.
 
 ## check-drupal
 
-Check the Drupal Status report for status and met requirement items and their serverity, such as:
+Anything at Drupals status report (Administer -> Reports -> Status report)
+for met requirements and their serverity, such as:
 - module updates
 - last run of cron
 - database schema

@@ -32,17 +32,6 @@ define('NAGIOS_WARNING', 1);
 define('NAGIOS_CRITICAL', 2);
 
 /** @} */
-
-/**
- * Drush version switch for including needed pm_release_recommended() 
- * in drush above v.5 which lives there in a different place.
- * 
- * @see https://www.drupal.org/node/2358075 
- */
-if ((int)DRUSH_VERSION > 5) {
-  $doc_prefix = drush_get_context('DOC_PREFIX');
-  include_once $doc_prefix . '/commands/pm/updatestatus.pm.inc';
-}
  
 /**
  * @defgroup helper_functions Helper functions
@@ -649,7 +638,8 @@ function _nagios_get_drupal_status_info() {
  * Parses the requirements by _nagios_get_drupal_status_info() 
  *
  * @return array
- *   An associative array with requirement_violation as indicator and items grouped by severities(requirement_warning, requirement_error) and ignored.
+ *   An associative array with uneeded drupal requirements with requirement_violation as indicator 
+ *   and items grouped by their severities(requirement_warning, requirement_error) and ignored.
  * @code
  * Array
  * (
@@ -660,6 +650,7 @@ function _nagios_get_drupal_status_info() {
  *                 (
  *                     [title] => Cron maintenance tasks
  *                     [value] => Last run 1 week 2 days ago
+ *                     [description] =>  You can <a href="/admin/reports/status/run-cron">run cron manually</a>.
  *                     [severity] => 1
  *                 )
  * 
@@ -676,6 +667,7 @@ function _nagios_get_drupal_status_info() {
  *                 (
  *                     [title] => Files directory
  *                     [value] => Not fully protected
+ *                     [description] => See <a href="http://drupal.org/SA-CORE-2013-003">http://drupal.org/SA-CORE-2013-003</a> for information about the recommended .htaccess file which should be added to the <em>sites/netzaffe.de/files</em> directory to help protect against arbitrary code execution.
  *                     [severity] => 2
  *                 )
  * 
@@ -684,6 +676,7 @@ function _nagios_get_drupal_status_info() {
  *                 (
  *                     [title] => HTTP request status
  *                     [value] => Fails
+ *                     [description] => Your system or network configuration does not allow Drupal to access web pages, resulting in reduced functionality. This could be due to your webserver configuration or PHP settings, and should be resolved in order to download information about available updates, fetch aggregator feeds, sign in via OpenID, or use other network-dependent services.
  *                     [severity] => 2
  *                 )
  *         )

@@ -13,6 +13,22 @@ include_once 'includes/nagios.inc';
  * @{  
  */
 
+
+/**
+ * Implementation of drush_COMMAND_init().
+ * 
+ * Drush version switch for including needed pm_release_recommended() 
+ * in drush above v.5 which lives there in a different place.
+ * 
+ * @see https://www.drupal.org/node/2358075 
+ */
+function drush_nagios_init() {
+  if ((int)DRUSH_VERSION > 5) {
+    $doc_prefix = drush_get_context('DOC_PREFIX');
+    include_once $doc_prefix . '/commands/pm/updatestatus.pm.inc';
+  }
+}
+
 /**
  * Implementation of hook_drush_help().
  * @param
