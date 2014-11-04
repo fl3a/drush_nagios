@@ -9,13 +9,17 @@ You can find the original [project page][6] at http://drupal.org/project/drush_n
 
 ## Commands
 
-drush_nagios includes the following command:
+drush_nagios includes the following commands:
 
 ## check-updates
 
 Checks for pending updates including Drupal (core), modules and themes grouped by type/serverity of update followed by the corresonding modules.
 
-This command has an option to ignore projects.
+This command has 2 option to ignore projects.
+- Via `--ignore option`, followed by project or comma seperated list of projects
+- Or via `--ignore-locked` option, which ignores project that are locked via `drush pm-update --lock`
+
+In both cases the ignored projects does not affect the exit status but they got listed with their severity.
 
 ## check-db-updates
 
@@ -31,7 +35,13 @@ for met requirements and their serverity, such as:
 - files directory writability
 - access to update.php
 - files directory protection via .htaccess
-- contribs that implements hook_requirements()
+- every project that implements `hook_requirements()`
+
+Like in check-updates, this command has a `--ignore` option for ignoring requirements/facilities too with the same behaviour as above.
+
+## Requirements
+
+Since this is a Drush extension, you will need Drush >=v.5.
 
 ## Installation
 
@@ -53,7 +63,7 @@ Since this is as drupal.org project, you might install it via drush, just type:
 ## Documentation
 
 Every command got a help.
-Type `drush help COMMAND` for options and further informations.
+Type `drush help COMMAND` for options, examples and further informations.
 
 - See [example.aliases.drushrc.php][7] for Drush alias configuration
 - See [Drush Nagios (drush_nagios) Doxygen Dokumentation][8]
