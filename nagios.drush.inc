@@ -15,14 +15,14 @@ include_once 'includes/nagios.inc';
 
 
 /**
- * Implementation of drush_COMMAND_init().
+ * Implementation of hook_drush_init().
  * 
  * Drush version switch for including needed pm_release_recommended() 
  * in drush above v.5 which lives there in a different place.
  * 
  * @see https://www.drupal.org/node/2358075 
  */
-function drush_nagios_init() {
+function nagios_drush_init() {
   if ((int)DRUSH_VERSION > 5) {
     $doc_prefix = drush_get_context('DOC_PREFIX');
     include_once $doc_prefix . '/commands/pm/updatestatus.pm.inc';
@@ -41,8 +41,10 @@ function nagios_drush_help($section) {
 Exit status
 
 * NAGIOS_OK (0)      - if monitored Drupal site is up to date
-* NAGIOS_WARNING (1) - if there is a code (core, contrib and theme) or pending database update available
-* NAGIOS_CRITICAL(2) - if there is a code update with severity \'Security update\' available
+* NAGIOS_WARNING (1) - if there is a code (core, contrib and theme), pending database update available 
+                       or unmet Drupal requirements with severity \'REQUIREMENT_WARNING\'(1)
+* NAGIOS_CRITICAL(2) - if there is a code update with severity \'Security update\' available 
+                       or unmet Drupal requirements with severity \'REQUIREMENT_ERROR\'(2)
 
 OK Message
 
@@ -115,7 +117,7 @@ function nagios_drush_command() {
     ),
   );
   $items['check-drupal-requirements'] = array(
-    'callback' => 'drush_drupal_requirements',
+    'callback' => 'drush_nagios_updates',
     'description' => 'Checks for anything under Drupals status report.',
     'bootstrap' => DRUSH_BOOTSTRAP_DRUPAL_FULL,
     'options' => array(
@@ -155,7 +157,7 @@ function drush_nagios_updates() {
     $info = _nagios_get_update_info();
     $parsed_info = _nagios_parse_update_info($info);
   }
-  else if ($command['command'] == 'check-updates') {
+  else if ($command['command'] == 'check-drupal-requirements') {
     $info = _nagios_get_drupal_status_info();
     $parsed_info = _nagios_parse_drupal_status_info($info);
     drush_print_r($requirements);
@@ -163,20 +165,5 @@ function drush_nagios_updates() {
   _nagios_print_message($parsed_info);
   drush_set_context('DRUSH_EXECUTION_COMPLETED', TRUE);
   exit(_nagios_exit_status($parsed_info));
-}
-
-/**
- * Command callback, print status message
- * and exit with exit status
- *
- * @return int 
- *   Exit status of the referenced functionn
- */
-function drush_drupal_requirements() {
-    $info = _nagios_get_drupal_status_info();
-    $parsed_info = _nagios_parse_drupal_status_info($info);
-    drush_print_r($parsed_info);
-    drush_set_context('DRUSH_EXECUTION_COMPLETED', TRUE);
-  //exit(_nagios_exit_status($parsed_update_info));
 }
 /** @} */ 
