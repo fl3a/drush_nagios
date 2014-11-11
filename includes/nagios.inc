@@ -696,13 +696,7 @@ function _nagios_get_drupal_status_info() {
  * @see <a href="https://api.drupal.org/api/drupal/includes%21install.inc/7">install.inc</a>
  */
 function _nagios_parse_drupal_status_info($requirements) {
-  $parsed_requirements = array(
-   // Indicator variable.
-   'requirement_violation' => FALSE,  
-   'requirement_warning' => array(),
-   'requirement_error' => array(),
-   'ignored' => array(),
-  );
+  $parsed_requirements = array();
   $ignore = array();
   $ignore = explode(',', drush_get_option('ignore'));
   foreach ($requirements as $key => $requirement) {
@@ -740,47 +734,84 @@ function _nagios_print_message($parsed_update_info) {
       '!site_root'=> drush_get_context('DRUSH_DRUPAL_ROOT') . '/' . drush_get_context('DRUSH_DRUPAL_SITE_ROOT'),
     )
   );
-  
   // Build updates message...
   
-  // Pending database updates message.
-  if ($parsed_update_info['has_updates']) {
-    if (array_key_exists('db_updates', $parsed_update_info)) {
-      if (count($parsed_update_info['db_updates'])) {
-        $status_msg .= dt('has pending database updates, run \'drush updatedb\' or visit update.php in your browser for more details.');
-      }
-    } 
-    // Module and core updates message.
-    else {
-      unset($parsed_update_info['has_updates']);    
-    
-       // Traverse serverities
-      foreach ($parsed_update_info as $serverity => $projects){
+  // Check indicator variables...
+  if ($parsed_update_info['has_updates'] || $parsed_update_info['requirement_violation']) {
+    $command = drush_get_command();
+    switch ($command['command']) {
+      // Pending database updates message.
+      case 'check-db-updates': 
+        if (count($parsed_update_info['db_updates'])) {
+          $status_msg .= dt('has pending database updates, run \'drush updatedb\' or visit update.php in your browser for more details.');
+        }
+        break;
+      // Module and core updates message.
+      case 'check-updates':
+        unset($parsed_update_info['has_updates']);    
+  
+        // Traverse serverities
+        foreach ($parsed_update_info as $serverity => $projects){
       
-        // Skip empty and uneeded serverities
-        if (count($projects) == 0 || $serverity == 'up_to_date' || $serverity == 'unknown') {
-          continue;
-        }
-        $ignored = array();
-        if ($serverity == 'ignored') {
-          foreach ($projects as $name => $project) {
-            $ignored[] = $name . '(' . $project['serverity'] . ')';
+          // Skip empty and uneeded serverities
+          if (count($projects) == 0 || $serverity == 'up_to_date' || $serverity == 'unknown') {
+            continue;
           }
-          $status_msg .= dt(' IGNORED BY SETTINGS: !modules',
-            array(
-              '!modules' => implode(',', $ignored),
-            )
-          );        
+          $ignored = array();
+          if ($serverity == 'ignored') {
+            foreach ($projects as $name => $project) {
+              $ignored[] = $name . '(' . $project['serverity'] . ')';
+            }
+            $status_msg .= dt(' IGNORED BY SETTINGS: !modules',
+              array(
+                '!modules' => implode(',', $ignored),
+              )
+            );        
+          }
+          else {
+            $status_msg .= dt(' !type: !modules',
+              array(
+                '!type' => strtoupper(str_replace('_', ' ', $serverity)),
+                '!modules' => implode(',', array_keys($projects)),
+              )
+            );     
+          }
         }
-        else {
-          $status_msg .= dt(' !type: !modules',
-            array(
-              '!type' => strtoupper(str_replace('_', ' ', $serverity)),
-              '!modules' => implode(',', array_keys($projects)),
-            )
-          );     
+        break;
+      case 'check-drupal-requirements':
+        unset($parsed_update_info['requirement_violation']);    
+    
+        // Traverse serverities
+        foreach ($parsed_update_info as $serverity => $requirements){
+          $ignored = array();
+          if ($serverity == 'ignored') {
+            foreach ($requirements as $name => $requirement) {
+              $ignored[] = $name . '(' . $requirement['severity'] . ')';
+            }
+            $status_msg .= dt(' IGNORED BY SETTINGS: !requirements',
+              array(
+                '!requirements' => implode(',', $ignored),
+              )
+            );        
+          }
+          else {
+            $status_msg .= dt(' !type: !requirements',
+              array(
+                '!type' => strtoupper(str_replace('_', ' ', $serverity)),
+                '!requirements' => implode(',', array_keys($requirements)),
+              )
+            );
+          }
         }
+      /*
+      drush_print_r(drush_get_context());
+      $commands = drush_get_commands();
+      if (array_key_exists('drupal-status', $commands)) {
+        $site = $
+        $status_msg .= dt("\nType 'drush drupal-status' for more details."); 
       }
+      */
+      break;  
     }
   }
   else {
@@ -804,7 +835,7 @@ function _nagios_exit_status($parsed_update_info) {
 
   if ($parsed_update_info['has_updates']) {
     $security_updates = (count($parsed_update_info['security_updates']) != 0);
-    $updates = (count($parsed_update_info['security_updates']) != 0);
+    $updates = (count($parsed_update_info['updates']) != 0);
     $not_supported = (count($parsed_update_info['not_supported']) != 0);
     $db_updates = (count($parsed_update_info['db_updates']) != 0);
     
