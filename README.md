@@ -25,7 +25,7 @@ In both cases the ignored projects does not affect the exit status but they got 
 
 Checks for pending database updates.
 
-## check-drupal
+## check-drupal-requirements
 
 Anything at Drupals status report (Administer -> Reports -> Status report)
 for met requirements and their serverity, such as:
