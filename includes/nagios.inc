@@ -748,7 +748,6 @@ function _nagios_print_message($parsed_update_info) {
       // Module and core updates message.
       case 'check-updates':
         unset($parsed_update_info['has_updates']);
-        drush_print_r($parsed_update_info);
         // Traverse serverities
         foreach ($parsed_update_info as $serverity => $projects){
 
