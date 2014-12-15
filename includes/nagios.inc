@@ -698,11 +698,8 @@ function _nagios_get_drupal_status_info() {
 function _nagios_parse_drupal_status_info($requirements) {
   $parsed_requirements = array();
   $ignore = drush_get_option('ignore', NULL);
-  drush_print_r($ignore);
   $ignore = isset($ignore) ? explode(',', $ignore) : array();
-  drush_print_r($ignore);
   foreach ($requirements as $key => $requirement) {
-    //drush_print_r($requirement); drush_print_r($key);
     if (array_key_exists('severity', $requirement) && !array_key_exists('reason', $requirement)) {
       if (in_array($key, $ignore)) {
         $parsed_requirements['ignored'][$key] =  $requirement;
@@ -751,7 +748,7 @@ function _nagios_print_message($parsed_update_info) {
       // Module and core updates message.
       case 'check-updates':
         unset($parsed_update_info['has_updates']);
-
+        drush_print_r($parsed_update_info);
         // Traverse serverities
         foreach ($parsed_update_info as $serverity => $projects){
 
@@ -805,14 +802,6 @@ function _nagios_print_message($parsed_update_info) {
             );
           }
         }
-      /*
-      drush_print_r(drush_get_context());
-      $commands = drush_get_commands();
-      if (array_key_exists('drupal-status', $commands)) {
-        $site = $
-        $status_msg .= dt("\nType 'drush drupal-status' for more details.");
-      }
-      */
       break;
     }
   }
@@ -835,7 +824,6 @@ function _nagios_print_message($parsed_update_info) {
  *   - NAGIOS_CRITICAL(2) if there are security or requirement warnings updates available
  */
 function _nagios_exit_status($parsed_update_info) {
-  drush_print_r($parsed_update_info);
   if ($parsed_update_info['has_updates'] || $parsed_update_info['requirement_violation']) {
     // Critical.
     $critical = (count($parsed_update_info['security_updates']) != 0
