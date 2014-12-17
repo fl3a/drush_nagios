@@ -90,7 +90,7 @@ Type `drush help COMMAND` for options, examples and further informations.
 
 ## Maintainers
 
-Florian Latzel (fl3a) - https://drupal.org/user/51103
+- Florian Latzel (fl3a) - https://drupal.org/user/51103
 
 ## Credits
 
