@@ -16,14 +16,26 @@ drush_nagios includes the following commands:
 Checks for pending updates including Drupal (core), modules and themes grouped by type/serverity of update followed by the corresonding modules.
 
 This command has 2 option to ignore projects.
-- Via `--ignore option`, followed by project or comma seperated list of projects
+- Via `--ignore` option, followed by project or comma seperated list of projects
 - Or via `--ignore-locked` option, which ignores project that are locked via `drush pm-update --lock`
 
 In both cases the ignored projects does not affect the exit status but they got listed with their severity.
 
+### Exit status
+
+- 0 = Everythings is OK
+- 1 = Pending updates
+- 2 = Pending security updates
+
+
 ## check-db-updates
 
 Checks for pending database updates.
+
+### Exit status
+
+- 0 = Everythings is OK
+- 1 = Pending database updates
 
 ## check-drupal-requirements
 
@@ -38,6 +50,14 @@ for met requirements and their serverity, such as:
 - every project that implements `hook_requirements()`
 
 Like in check-updates, this command has a `--ignore` option for ignoring requirements/facilities too with the same behaviour as above.
+
+Ignored requirements does not affect the exit status but they got listed with their severity.
+
+### Exit status
+
+- 0 = Everythings is OK
+- 1 = Requirement warning
+- 2 = Requirement error
 
 ## Requirements
 
@@ -68,16 +88,14 @@ Type `drush help COMMAND` for options, examples and further informations.
 - See [example.aliases.drushrc.php][7] for Drush alias configuration
 - See [Drush Nagios (drush_nagios) Doxygen Dokumentation][8]
 
+## Maintainers
+
+Florian Latzel (fl3a) - https://drupal.org/user/51103
+
 ## Credits
 
 Thanks to the mighty hundfred, friend and Bastard Operator from Hell,
 who inspired me to write this (Nagios) Drush plugin.
-
-This module was and written by [fl3a][9], [Florian Latzel][10], 
-  
-[Drupal-CMS-[Consulting  Architecture Development] and Open Source support in Cologne][9],      
-
-proud member of [Reinblau, Drupal Agency in Berlin, Cologne and Munich][11].   
 
 [1]:http://drupal.org/project/drush_multi
 [2]:http://en.wikipedia.org/wiki/Nagios
@@ -87,6 +105,3 @@ proud member of [Reinblau, Drupal Agency in Berlin, Cologne and Munich][11].
 [6]:http://drupal.org/project/drush_nagios
 [7]:http://cgit.drupalcode.org/drush_nagios/tree/example/example.aliases.drushrc.php
 [8]:http://is-loesungen.de/docu/drush_nagios/index.html
-[9]:https://drupal.org/user/51103
-[10]:http://is-loesungen.de
-[11]:http://reinblau.de
