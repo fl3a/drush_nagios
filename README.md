@@ -3,8 +3,9 @@
 ## Introduction
 
 Isolated Nagios/Icinga functionality from [drush_multi][1],
-for the usage as [Nagios][2]/[Icinga][3] via [NRPE Plugin][4] or ssh with [Drush][5], 
-it just prints a message and exit with an exit status.
+for [Nagios][2]/[Icinga][3] monitoring via [NRPE Plugin][4] or ssh as [Drush][5] plugin. 
+
+It just prints a message and exit with an exit status (severity).
 
 You can find the original [project page][6] at http://drupal.org/project/drush_nagios .
 
@@ -61,7 +62,7 @@ Download from [project page][6] and extract this extension to a number of places
 
 Since this is as drupal.org project, you might install it via drush, just type:
 	
-    drush dl drush_nagios
+    drush @none dl drush_nagios
 
 ## Configuration
 
