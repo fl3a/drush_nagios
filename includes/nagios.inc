@@ -229,7 +229,8 @@ function _nagios_get_db_update_info() {
  * @param array $update_info
  *   Update information
  *
- * @return array
+ * @retval array
+ *
  *   An array with an update indicator 'has_updates' (boolean)
  *   and keyed on the following serverities which contain the corresponding projects
  *   - updates
@@ -246,7 +247,7 @@ function _nagios_get_db_update_info() {
  *  - existing_version
  *  - latest_version
  *  - release_link
- *  - serverity
+ *  - severity
  *
  * Example called with --ignore=cnr,devel :
  *
@@ -262,7 +263,7 @@ function _nagios_get_db_update_info() {
  *                    [existing_version] => 7.x-1.x-dev
  *                    [latest_version] => 7.x-1.x-dev
  *                    [release_link] => http://drupal.org/node/95867
- *                    [serverity] => Aktualisierung verfügbar
+ *                    [severity] => Aktualisierung verfügbar
  *                )
  *
  *            [password_policy] => Array
@@ -271,7 +272,7 @@ function _nagios_get_db_update_info() {
  *                    [existing_version] => 7.x-1.0-beta1
  *                    [latest_version] => 7.x-1.0-beta2
  *                    [release_link] => http://drupal.org/node/1331478
- *                    [serverity] => Aktualisierung verfügbar
+ *                    [severity] => Aktualisierung verfügbar
  *                )
  *
  *        )
@@ -284,7 +285,7 @@ function _nagios_get_db_update_info() {
  *                    [existing_version] => 7.x-1.3
  *                    [latest_version] => 7.x-1.6
  *                    [release_link] => http://drupal.org/node/1337106
- *                    [serverity] => SECURITY UPDATE available
+ *                    [severity] => SECURITY UPDATE available
  *                )
  *
  *        )
@@ -313,7 +314,7 @@ function _nagios_get_db_update_info() {
  *                    [existing_version] => 7.x-4.1
  *                    [latest_version] => 7.x-4.22
  *                    [release_link] => http://drupal.org/node/1344032
- *                    [serverity] => Aktualisierung verfügbar
+ *                    [severity] => Aktualisierung verfügbar
  *                )
  *
  *            [devel] => Array
@@ -322,7 +323,7 @@ function _nagios_get_db_update_info() {
  *                    [existing_version] => 7.x-1.0
  *                    [latest_version] => 7.x-1.2
  *                    [release_link] => http://drupal.org/node/1226936
- *                    [serverity] => SECURITY UPDATE available
+ *                    [severity] => SECURITY UPDATE available
  *                )
  *
  *        )
@@ -334,7 +335,7 @@ function _nagios_get_db_update_info() {
  *                    [existing_version] => 7.9
  *                    [latest_version] => 7.9
  *                    [release_link] => http://drupal.org/node/1322736
- *                    [serverity] => Aktualisierung verfügbar
+ *                    [severity] => Aktualisierung verfügbar
  *                )
  *
  *        )
@@ -381,7 +382,7 @@ function _nagios_parse_update_info($update_info) {
     if ($update_type != dt('Unknown') || $update_type != dt('Unable to check status')) {
       $update['latest_version'] =  $project['latest_version'];
       $update['release_link'] =  $project['releases'][$project['latest_version']]['release_link'];
-      $update['serverity'] =  dt($update_type);
+      $update['severity'] =  dt($update_type);
     }
 
     // Add projects which are locked through `drush pm-update --lock` to ingnore array.
@@ -724,6 +725,8 @@ function _nagios_parse_drupal_status_info($requirements) {
  * Monitores a single Drupal site for module and core updates
  *
  * Print a message for nagios
+ *
+ * @retval void
  */
 function _nagios_print_message($parsed_update_info) {
 
@@ -749,16 +752,16 @@ function _nagios_print_message($parsed_update_info) {
       case 'check-updates':
         unset($parsed_update_info['has_updates']);
         // Traverse serverities
-        foreach ($parsed_update_info as $serverity => $projects){
+        foreach ($parsed_update_info as $severity => $projects){
 
           // Skip empty and uneeded serverities
-          if (count($projects) == 0 || $serverity == 'up_to_date' || $serverity == 'unknown') {
+          if (count($projects) == 0 || $erverity == 'up_to_date' || $severity == 'unknown') {
             continue;
           }
           $ignored = array();
-          if ($serverity == 'ignored') {
+          if ($severity == 'ignored') {
             foreach ($projects as $name => $project) {
-              $ignored[] = $name . '(' . $project['serverity'] . ')';
+              $ignored[] = $name . '(' . $project['severity'] . ')';
             }
             $status_msg .= dt(' IGNORED BY SETTINGS: !modules',
               array(
@@ -769,7 +772,7 @@ function _nagios_print_message($parsed_update_info) {
           else {
             $status_msg .= dt(' !type: !modules',
               array(
-                '!type' => strtoupper(str_replace('_', ' ', $serverity)),
+                '!type' => strtoupper(str_replace('_', ' ', $severity)),
                 '!modules' => implode(',', array_keys($projects)),
               )
             );
@@ -780,9 +783,9 @@ function _nagios_print_message($parsed_update_info) {
         unset($parsed_update_info['requirement_violation']);
 
         // Traverse serverities
-        foreach ($parsed_update_info as $serverity => $requirements){
+        foreach ($parsed_update_info as $severity => $requirements){
           $ignored = array();
-          if ($serverity == 'ignored') {
+          if ($severity == 'ignored') {
             foreach ($requirements as $name => $requirement) {
               $ignored[] = $name . '(' . $requirement['severity'] . ')';
             }
@@ -795,7 +798,7 @@ function _nagios_print_message($parsed_update_info) {
           else {
             $status_msg .= dt(' !type: !requirements',
               array(
-                '!type' => strtoupper(str_replace('_', ' ', $serverity)),
+                '!type' => strtoupper(str_replace('_', ' ', $severity)),
                 '!requirements' => implode(',', array_keys($requirements)),
               )
             );
@@ -805,7 +808,26 @@ function _nagios_print_message($parsed_update_info) {
     }
   }
   else {
-    $status_msg = $status_msg . dt('Everythings OK...');
+    // Ok message with ignored.cd
+    if ($parsed_update_info['ignored']) {
+      foreach ($parsed_update_info as $severity => $requirements) {
+        $ignored = array();
+        if ($severity == 'ignored') {
+          foreach ($requirements as $name => $requirement) {
+            $ignored[] = $name . '(' . $requirement['severity'] . ')';
+          }
+          $status_msg .= dt('Everythings OK, IGNORED BY SETTINGS: !requirements',
+            array(
+              '!requirements' => implode(',', $ignored),
+            )
+          );
+        }
+      }
+    }
+    // OK message,
+    else {
+      $status_msg = $status_msg . dt('Everythings OK...');
+    }
   }
   // Print message
   drush_print($status_msg);
@@ -816,7 +838,7 @@ function _nagios_print_message($parsed_update_info) {
  *
  * @param array $parsed_update_info
  *
- * @return int
+ * @retval int
  *   - NAGIOS_OK (0) if monitored site is up to date,
  *   - NAGIOS_WARNING (1) if there are updates, requirements warnings
  *     or unsupported modules available
