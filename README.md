@@ -3,7 +3,8 @@
 ## Introduction
 
 Isolated Nagios/Icinga functionality from [drush_multi][1],
-for the usage as [Nagios][2]/i[Icinga][3] [NRPE Plugin][4] via [Drush][5], it just prints a message and exit with an exit status.
+for the usage as [Nagios][2]/[Icinga][3] via [NRPE Plugin][4] or ssh with [Drush][5], 
+it just prints a message and exit with an exit status.
 
 You can find the original [project page][6] at http://drupal.org/project/drush_nagios .
 
@@ -21,21 +22,9 @@ This command has 2 option to ignore projects.
 
 In both cases the ignored projects does not affect the exit status but they got listed with their severity.
 
-### Exit status
-
-- 0 = Everythings is OK
-- 1 = Pending updates
-- 2 = Pending security updates
-
-
 ## check-db-updates
 
 Checks for pending database updates.
-
-### Exit status
-
-- 0 = Everythings is OK
-- 1 = Pending database updates
 
 ## check-drupal-requirements
 
@@ -52,12 +41,6 @@ for met requirements and their serverity, such as:
 Like in check-updates, this command has a `--ignore` option for ignoring requirements/facilities too with the same behaviour as above.
 
 Ignored requirements does not affect the exit status but they got listed with their severity.
-
-### Exit status
-
-- 0 = Everythings is OK
-- 1 = Requirement warning
-- 2 = Requirement error
 
 ## Requirements
 
@@ -80,13 +63,20 @@ Since this is as drupal.org project, you might install it via drush, just type:
 	
     drush dl drush_nagios
 
+## Configuration
+
+- See example.aliases.drushrc.php at examples directory for drush_nagios specific settings within an alias file.
+- See example.drushrc.php at examples directory for drush_nagios specific settings within a Drush runtime config (drushrc) file.
+
 ## Documentation
 
-Every command got a help.
-Type `drush help COMMAND` for options, examples and further informations.
+Every command got a help, for options, examples and further informations just type:
 
-- See [example.aliases.drushrc.php][7] for Drush alias configuration
-- See [Drush Nagios (drush_nagios) Doxygen Dokumentation][8]
+    drush help COMMAND
+
+- See [example.aliases.drushrc.php][7] for example of valid statements for an alias file.
+- See [example.drushrc.php][8] for examples of valid statements for a Drush runtime config (drushrc) file.
+- See [Drush Nagios (drush_nagios) Doxygen Dokumentation][9]
 
 ## Maintainers
 
@@ -103,5 +93,6 @@ who inspired me to write this (Nagios) Drush plugin.
 [4]:http://en.wikipedia.org/wiki/Nagios#NRPE
 [5]:http://drush.ws
 [6]:http://drupal.org/project/drush_nagios
-[7]:http://cgit.drupalcode.org/drush_nagios/tree/example/example.aliases.drushrc.php
-[8]:http://is-loesungen.de/docu/drush_nagios/index.html
+[7]:http://api.drush.org/api/drush/examples%21example.aliases.drushrc.php/5.x
+[8]:http://api.drush.org/api/drush/examples%21example.drushrc.php/5.x
+[9]:http://is-loesungen.de/docu/drush_nagios/index.html
