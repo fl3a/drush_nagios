@@ -2,8 +2,9 @@
 
 /**
  * @file 
- * Drush site alias configuration 
- * with command specific options for nagios
+ * Drush site alias configuration with command specific options
+ * for drush_nagios (https://www.drupal.org/project/drush_nagios)
+ * used via NRPE or via ssh.
  *
  * Drush will search for aliases in any of these files using
  * the alias search path.  The following locations are examined
@@ -21,28 +22,53 @@
  *      or any local Drupal site indicated by an alias used as
  *      a parameter to a command
  *      
- * @see http://drush.ws/examples/example.aliases.drushrc.php
+ * @see http://api.drush.org/api/drush/examples%21example.aliases.drushrc.php/5.x
+ * for example of valid statements for an alias file.
  */
-
 
 /**
- * Site alias 'dev' with command specific options for nagios
- * 
- * - ignore
+ * Settings for connecting a (remote) site  on another host *through ssh*.
+ */
+$aliases['remote'] = array(
+  'remote-user' => 'user',
+  'remote-host' => 'server.example.com',
+  'remote-os' => 'Linux',
+  'ssh-options' => '-p 1337 -i /home/user/.ssh/identiy',
+);
+
+/**
+ * Site alias 'dev' with command specific options for drush_nagios
+ *
+ * - Parent setting
+ * @code $aliases['dev']['parent'] = '@remote';@endcode
+ *   - If monitoring should be done *through ssh* you will need this option
+ * in combination with above declared #$aliases['remote'].
+ *   - If monitoring should be done through NRPE, you will not need this line and
+ * above declared #$aliases['remote']`.
+ * - Specific options for check-updates command
+ *  - ignore
  * @code $aliases['dev']['command-specific']['check-updates']['ignore'] = 'project1,project2,projectN';@endcode
- *  - Comma seperated list of projects which should be ignored, useful for patched, modified modules etc.
- * - ignore-locked
+ *   - Comma seperated list of projects which should be ignored, useful for patched, modified modules etc.
+ *  - ignore-locked
  * @code $aliases['dev']['command-specific']['check-updates']['ingnore-locked'] = 1';@endcode
- *  - Ignore projects which are locked by `drush pm-update --lock`.
+ *   - Ignore projects which are locked by `drush pm-update --lock`.
+ * - Specific options for check-drupal-requirements command
+ *  - ignore
+ * @code $aliases['dev']['command-specific']['check-drupal-requirements']['ignore'] = 'facility1,facility2,facilityN';@endcode
+ *    - Facility or comma seperated list of facilities which should be ignored,
  */
 $aliases['dev'] = array(
-  'uri' => 'dev.mydrupalsite.com',
+  'uri' => 'dev.example.com',
   'root' => '/path/to/drupal/root',
+  'parent' => '@remote',
 
   'command-specific' => array (
     'check-updates' => array(
       'ignore' => 'project1,project2,projectN',
       'ignore-locked' => 1,
     ),
+    'check-drupal-requirements' => array(
+      'ignore' => 'facility1,facility2,facilityN',
+    )
   ),
 );
