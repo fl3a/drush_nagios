@@ -38,17 +38,14 @@ function nagios_drush_init() {
  */
 function nagios_drush_help($section) {
   $help_header = dt('
-Exit status
+
+Exit status, returned severities:
 
 * NAGIOS_OK (0)      - if monitored Drupal site is up to date
 * NAGIOS_WARNING (1) - if there is a code (core, contrib and theme), pending database update available 
                        or unmet Drupal requirements with severity \'REQUIREMENT_WARNING\'(1)
 * NAGIOS_CRITICAL(2) - if there is a code update with severity \'Security update\' available 
                        or unmet Drupal requirements with severity \'REQUIREMENT_ERROR\'(2)
-
-OK Message
-
-* /var/www/example.com/drupal/sites/default: Everythings OK...
 ');
   switch ($section) {
     case 'meta:nagios:title':
@@ -82,8 +79,6 @@ function nagios_drush_command() {
       'drush @example check-updates --ignore=ctools,email' => '/path/to/drupal/sites/default:  UPDATES: admin_menu,ckeditor,ckeditor_link,conditional_fields,date,devel,devel_themer,entity,features,field_collection,link,menu_attributes,menu_link,references,transliteration,views_datasource,webform IGNORED BY SETTINGS: ctools(SECURITY UPDATE available),email(SECURITY UPDATE available)',
      ), 
     'options' => array(
-      //'changelog' => 'Show release link / link to changelog for the recommended version of a affected projects.',
-      //'show-versions' => 'Show used / current and recommended versions for a affected project..',
       'ignore' => array(
         'description' => 'Project or comma seperated list of projects which should be ignored.',
         'value' => 'required',
@@ -115,6 +110,18 @@ function nagios_drush_command() {
     'examples' => array(
       'drush @example check-db-updates' => '\'/path/to/drupal/sites/default: has pending database updates, run \'drush updatedb\' or visit update.php in your browser for more details.\' with exit status 1',
     ),
+    /**
+     * @todo Implement  option severity for check-db-updates command
+     */
+    /*
+    'options' => array(
+      'severity' => array(
+        'description' => 'Severity if there are pending database updates',
+        'value' => 'required',
+        'example-value' => '1,2',
+      ),
+    ),
+    */
   );
   $items['check-drupal-requirements'] = array(
     'callback' => 'drush_nagios_updates',
@@ -122,14 +129,11 @@ function nagios_drush_command() {
     'bootstrap' => DRUSH_BOOTSTRAP_DRUPAL_FULL,
     'options' => array(
        'ignore' => array(
-        'description' => 'Requirement or comma seperated list of requirements which should be ignored.',
+        'description' => 'Facility or comma seperated list of facilities which should be ignored,',
         'value' => 'required',
         'example-value' => 'unicode',
       ),
-    ),   
-    //'examples' => array(
-    //  'drush @example check-db-updates' => '\'/path/to/drupal/sites/default: has pending database updates, run \'drush updatedb\' or visit update.php in your browser for more details.\' with exit status 1',
-    //),
+    ),
   );
   return $items;
 }
@@ -160,7 +164,6 @@ function drush_nagios_updates() {
   else if ($command['command'] == 'check-drupal-requirements') {
     $info = _nagios_get_drupal_status_info();
     $parsed_info = _nagios_parse_drupal_status_info($info);
-    drush_print_r($requirements);
   }
   _nagios_print_message($parsed_info);
   drush_set_context('DRUSH_EXECUTION_COMPLETED', TRUE);
