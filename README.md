@@ -45,7 +45,7 @@ Ignored requirements does not affect the exit status but they got listed with th
 
 ## Requirements
 
-Since this is a Drush extension, you will need Drush >=v.5.
+Since this is a Drush extension, you will need Drush greater or equal Drush version 5.
 
 ## Installation
 
